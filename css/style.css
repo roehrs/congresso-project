@@ -1,0 +1,43 @@
+/* Estilos básicos do simulador */
+body { background-color: #f8f9fa; }
+
+.canvas-drop {
+  min-height: 240px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.componente-item {
+  cursor: grab;
+}
+
+.componente-preview {
+  border: 1px dashed #ced4da;
+  background: #fdfdfd;
+  padding: 12px;
+  border-radius: .5rem;
+}
+
+/* Aparência de página protótipo */
+.prototype-page {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  background: #ffffff;
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,.08);
+}
+
+.prototype-block + .prototype-block {
+  /* espaço vertical entre componentes reais */
+  margin-top: 6px;
+}
+
+/* Rolagem na lista de componentes do editor */
+#lista-componentes {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 4px; /* espaço para não colar na barra de rolagem */
+}
+
