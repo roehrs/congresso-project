@@ -9,10 +9,6 @@ body { background-color: #f8f9fa; }
   justify-content: center;
 }
 
-.componente-item {
-  cursor: grab;
-}
-
 .componente-preview {
   border: 1px dashed #ced4da;
   background: #fdfdfd;

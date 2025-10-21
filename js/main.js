@@ -1,3 +1,4 @@
+// ...existing code...
 // Lógica principal de navegação e interações entre páginas
 // Usa localStorage para manter persona sorteada e componentes escolhidos
 
@@ -63,8 +64,6 @@
     itens.forEach((comp) => {
       const item = document.createElement('div');
       item.className = 'card componente-item';
-      item.draggable = true;
-      item.ondragstart = (ev) => onDragStart(ev, comp.id);
       item.innerHTML = `
         <div class="card-body p-3">
           <div class="d-flex justify-content-between align-items-center">
@@ -75,9 +74,19 @@
             <span class="badge text-bg-secondary">#${comp.id}</span>
           </div>
           <div class="mt-2 small">${comp.descricao}</div>
+          <div class="mt-3 d-flex justify-content-end">
+            <button class="btn btn-sm btn-primary select-btn" data-id="${comp.id}">Selecionar</button>
+          </div>
         </div>
       `;
       lista.appendChild(item);
+
+      // adiciona listener ao botão Selecionar
+      const btn = item.querySelector('.select-btn');
+      btn?.addEventListener('click', () => {
+        const id = Number(btn.getAttribute('data-id'));
+        window.selectComponent(id);
+      });
     });
   }
 
@@ -108,7 +117,7 @@
     if (!canvas) return;
     const ids = lerComponentesEscolhidos();
     if (ids.length === 0) {
-      canvas.textContent = 'Arraste e solte componentes aqui';
+      canvas.textContent = 'Clique em "Selecionar" nos componentes para adicioná-los ao canvas';
       canvas.classList.add('text-muted');
       return;
     }
@@ -154,22 +163,21 @@
     });
   }
 
-  // Handlers globais simples (para uso inline em atributos HTML)
-  window.onDragStart = function (event, componenteId) {
-    event.dataTransfer.setData('text/plain', String(componenteId));
-  };
-
-  window.onDrop = function (event) {
-    event.preventDefault();
-    const rawId = event.dataTransfer.getData('text/plain');
-    const id = Number(rawId);
-    if (!id) return;
-    const atuais = lerComponentesEscolhidos();
-    atuais.push(id);
-    salvarComponentesEscolhidos(atuais);
+  // Função pública para selecionar/adicionar componente no canvas
+  window.selectComponent = function (id) {
+    const ids = lerComponentesEscolhidos();
+    if (ids.includes(id)) {
+      // evita duplicatas; altere se quiser permitir múltiplas instâncias
+      alert('Componente já selecionado.');
+      return;
+    }
+    ids.push(id);
+    salvarComponentesEscolhidos(ids);
     atualizarOrdemUI();
     renderCanvasPreview();
   };
+
+  // removidos handlers de drag & drop (não mais usados)
 
   // Bootstrap das páginas
   document.addEventListener('DOMContentLoaded', () => {
@@ -183,4 +191,3 @@
     }
   });
 })();
-
