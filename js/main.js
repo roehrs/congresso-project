@@ -54,41 +54,90 @@
   }
 
   function renderListaComponentes() {
-    const lista = document.getElementById('lista-componentes');
-    if (!lista) return;
-    lista.innerHTML = '';
-    const itens = state.filtroTipo === 'Todos'
-      ? window.componentes
-      : window.componentes.filter((c) => c.tipo === state.filtroTipo);
+  const lista = document.getElementById('lista-componentes');
+  if (!lista) return;
+  lista.innerHTML = '';
+  const itens = state.filtroTipo === 'Todos'
+    ? window.componentes
+    : window.componentes.filter((c) => c.tipo === state.filtroTipo);
 
-    itens.forEach((comp) => {
-      const item = document.createElement('div');
-      item.className = 'card componente-item';
-      item.innerHTML = `
-        <div class="card-body p-3">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <div class="fw-semibold">${comp.tipo}</div>
-              <small class="text-muted">Acessibilidade: ${comp.acessibilidade}</small>
-            </div>
-            <span class="badge text-bg-secondary">#${comp.id}</span>
+  itens.forEach((comp) => {
+    const item = document.createElement('div');
+    item.className = 'card componente-item';
+    item.innerHTML = `
+      <div class="card-body p-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fw-semibold">${comp.tipo}</div>
+            <small class="text-muted">Acessibilidade: ${comp.acessibilidade}</small>
           </div>
-          <div class="mt-2 small">${comp.descricao}</div>
-          <div class="mt-3 d-flex justify-content-end">
-            <button class="btn btn-sm btn-primary select-btn" data-id="${comp.id}">Selecionar</button>
+          <span class="badge text-bg-secondary">#${comp.id}</span>
+        </div>
+
+        <div class="mt-2 small">${comp.descricao}</div>
+
+        <!-- Preview visual do componente -->
+        <div class="mt-3 componente-preview" data-preview-id="${comp.id}">
+          <div class="preview-inner">
+            ${comp.html || '<div class="text-muted small">Sem preview disponível</div>'}
           </div>
         </div>
-      `;
-      lista.appendChild(item);
 
-      // adiciona listener ao botão Selecionar
-      const btn = item.querySelector('.select-btn');
-      btn?.addEventListener('click', () => {
-        const id = Number(btn.getAttribute('data-id'));
-        window.selectComponent(id);
-      });
+        <div class="mt-3 d-flex justify-content-end">
+          <button class="btn btn-sm btn-primary select-btn" data-id="${comp.id}">Selecionar</button>
+        </div>
+      </div>
+    `;
+    lista.appendChild(item);
+
+    // evita execução/efeitos colaterais de scripts (caso existam) — remove qualquer <script>
+    const previewEl = item.querySelector('.componente-preview');
+    previewEl.querySelectorAll('script').forEach((s) => s.remove());
+
+    // adiciona listener ao botão Selecionar
+    const btn = item.querySelector('.select-btn');
+    btn?.addEventListener('click', () => {
+      const id = Number(btn.getAttribute('data-id'));
+      window.selectComponent(id);
     });
-  }
+  });
+
+  // ajusta escala das previews após inserção
+  requestAnimationFrame(adjustAllPreviews);
+}
+
+// calcula e aplica escala para uma preview para caber no container
+function adjustPreview(previewEl) {
+  const inner = previewEl.querySelector('.preview-inner');
+  if (!inner) return;
+
+  // reset para medir tamanho real
+  inner.style.transform = '';
+  inner.style.width = '';
+
+  // dimensões
+  const containerH = previewEl.clientHeight || 120;
+  const contentH = inner.scrollHeight || inner.offsetHeight || 1;
+  const scale = Math.min(1, containerH / contentH);
+
+  inner.style.transform = `scale(${scale})`;
+
+  // garantir que o conteúdo escalado ocupe a largura do container:
+  // quando escalado para <1, precisamos aumentar a largura do inner para manter layout
+  inner.style.width = `${100 / scale}%`;
+}
+
+// percorre todas as previews na lista e ajusta
+function adjustAllPreviews() {
+  document.querySelectorAll('.componente-preview').forEach((el) => adjustPreview(el));
+}
+
+// recalcula ao redimensionar a janela
+window.addEventListener('resize', () => {
+  // debounce simples
+  clearTimeout(window.__previewResizeTimer);
+  window.__previewResizeTimer = setTimeout(adjustAllPreviews, 120);
+});
 
   function lerComponentesEscolhidos() {
     const raw = localStorage.getItem(STORAGE_KEYS.componentesEscolhidos);
