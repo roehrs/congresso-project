@@ -6,7 +6,133 @@
   const STORAGE_KEYS = {
     persona: 'simulador_persona',
     componentesEscolhidos: 'simulador_componentes',
+    colorSettings: 'simulador_colors'
   };
+
+  // Cores padrão
+  const DEFAULT_COLORS = {
+    accent: '#0d6efd',
+    background: '#ffffff',
+    text: '#212529'
+  };
+
+  function salvarColorSettings(colors) {
+    localStorage.setItem(STORAGE_KEYS.colorSettings, JSON.stringify(colors));
+  }
+
+  function lerColorSettings() {
+    const raw = localStorage.getItem(STORAGE_KEYS.colorSettings);
+    return raw ? JSON.parse(raw) : { ...DEFAULT_COLORS };
+  }
+
+  function applyColorSettings(colors) {
+    const canvas = document.getElementById('canvas');
+    if (!canvas) return;
+    canvas.style.setProperty('--accent-color', colors.accent);
+    canvas.style.setProperty('--component-bg', colors.background);
+    canvas.style.setProperty('--component-text', colors.text);
+    // também aplica visualmente nas previews (quando estiverem montadas)
+    document.querySelectorAll('.componente-preview .preview-inner, .prototype-page').forEach((el) => {
+      el.style.setProperty('--accent-color', colors.accent);
+      el.style.setProperty('--component-bg', colors.background);
+      el.style.setProperty('--component-text', colors.text);
+    });
+  }
+
+  function initCustomizer() {
+    const inpAccent = document.getElementById('color-accent');
+    const inpBg = document.getElementById('color-bg');
+    const inpText = document.getElementById('color-text');
+    const btnAplicar = document.getElementById('btn-aplicar-cores');
+    const btnReset = document.getElementById('btn-reset-cores');
+    if (!inpAccent || !inpBg || !inpText) return;
+
+    // carregar valores salvos
+    const saved = lerColorSettings();
+    inpAccent.value = saved.accent || DEFAULT_COLORS.accent;
+    inpBg.value = saved.background || DEFAULT_COLORS.background;
+    inpText.value = saved.text || DEFAULT_COLORS.text;
+    applyColorSettings(saved);
+
+    btnAplicar?.addEventListener('click', () => {
+      const colors = {
+        accent: inpAccent.value,
+        background: inpBg.value,
+        text: inpText.value
+      };
+      salvarColorSettings(colors);
+      applyColorSettings(colors);
+    });
+
+    btnReset?.addEventListener('click', () => {
+      salvarColorSettings(DEFAULT_COLORS);
+      inpAccent.value = DEFAULT_COLORS.accent;
+      inpBg.value = DEFAULT_COLORS.background;
+      inpText.value = DEFAULT_COLORS.text;
+      applyColorSettings(DEFAULT_COLORS);
+    });
+  }
+
+// ...existing code...
+
+   function initEditor() {
+    const canvas = document.getElementById('canvas');
+    if (!canvas) return;
+
+    renderListaComponentes();
+    atualizarOrdemUI();
+    renderCanvasPreview();
+
+    // inicializa customizador de cores (aplica cores já salvas)
+    initCustomizer();
+
+    const btnLimpar = document.getElementById('btn-limpar');
+    btnLimpar?.addEventListener('click', () => {
+      // limpa componentes selecionados
+      salvarComponentesEscolhidos([]);
+      atualizarOrdemUI();
+      renderCanvasPreview();
+
+      // resetar cores para os defaults e aplicar
+      salvarColorSettings(DEFAULT_COLORS);
+      applyColorSettings(DEFAULT_COLORS);
+
+      // atualizar inputs do painel de customização (se existirem)
+      const inpAccent = document.getElementById('color-accent');
+      const inpBg = document.getElementById('color-bg');
+      const inpText = document.getElementById('color-text');
+      if (inpAccent) inpAccent.value = DEFAULT_COLORS.accent;
+      if (inpBg) inpBg.value = DEFAULT_COLORS.background;
+      if (inpText) inpText.value = DEFAULT_COLORS.text;
+    });
+
+    // --- FILTROS: usa delegação no grupo de botões (mais robusto)
+    const filtroGroup = document.querySelector('[aria-label="Filtro por tipo"]');
+    if (filtroGroup) {
+      filtroGroup.addEventListener('click', (ev) => {
+        const btn = ev.target.closest('[data-filter]');
+        if (!btn) return;
+        // atualiza aparência active
+        filtroGroup.querySelectorAll('[data-filter]').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // atualiza estado e re-renderiza lista
+        state.filtroTipo = btn.getAttribute('data-filter') || 'Todos';
+        renderListaComponentes();
+      });
+    } else {
+      // fallback: se o grupo não existir, tenta ligar diretamente aos botões
+      const filtroBotoes = document.querySelectorAll('[data-filter]');
+      filtroBotoes.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          filtroBotoes.forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.filtroTipo = btn.getAttribute('data-filter') || 'Todos';
+          renderListaComponentes();
+        });
+      });
+    }
+  }
 
   const state = {
     filtroTipo: 'Todos',
@@ -188,33 +314,6 @@ window.addEventListener('resize', () => {
     });
     canvas.innerHTML = '';
     canvas.appendChild(page);
-  }
-
-  function initEditor() {
-    const canvas = document.getElementById('canvas');
-    if (!canvas) return;
-
-    renderListaComponentes();
-    atualizarOrdemUI();
-    renderCanvasPreview();
-
-    const btnLimpar = document.getElementById('btn-limpar');
-    btnLimpar?.addEventListener('click', () => {
-      salvarComponentesEscolhidos([]);
-      atualizarOrdemUI();
-      renderCanvasPreview();
-    });
-
-    // Filtros por tipo
-    const filtroBotoes = document.querySelectorAll('[data-filter]');
-    filtroBotoes.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        filtroBotoes.forEach((b) => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.filtroTipo = btn.getAttribute('data-filter') || 'Todos';
-        renderListaComponentes();
-      });
-    });
   }
 
   // Função pública para selecionar/adicionar componente no canvas

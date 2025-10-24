@@ -345,11 +345,11 @@ const componentes = [
 <section class="py-3">
   <div class="container">
     <div class="row g-2 row-cols-2 row-cols-md-4">
-      ${Array.from({length:8}).map((_,i)=>`
+      ${Array.from({ length: 8 }).map((_, i) => `
       <div class='col'>
         <div class='card h-100'>
           <div class='card-body p-2'>
-            <div class='small text-muted mb-1'>Item ${i+1}</div>
+            <div class='small text-muted mb-1'>Item ${i + 1}</div>
             <a class='btn btn-sm btn-light border' href='#'>Ver</a>
           </div>
         </div>
@@ -414,7 +414,7 @@ const componentes = [
   </div>
 </footer>`
   }
-  ,{
+  , {
     id: 16,
     tipo: "Footer",
     acessibilidade: "media",
@@ -446,7 +446,7 @@ const componentes = [
   </div>
 </footer>`
   }
-  ,{
+  , {
     id: 17,
     tipo: "Footer",
     acessibilidade: "baixa",
@@ -462,7 +462,7 @@ const componentes = [
   </div>
 </footer>`
   }
-  ,{
+  , {
     id: 18,
     tipo: "Footer",
     acessibilidade: "alta",
@@ -486,7 +486,7 @@ const componentes = [
   </div>
 </footer>`
   }
-  ,{
+  , {
     id: 19,
     tipo: "Footer",
     acessibilidade: "media",
