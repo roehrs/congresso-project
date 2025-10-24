@@ -1,38 +1,44 @@
 /* Estilos básicos do simulador */
-body { background-color: #f8f9fa; }
+:root {
+  --canvas-padding: 1rem;
+  --preview-height: 120px;
+  --selection-outline-color: #0d6efd;
+}
 
+body {
+  background-color: #f8f9fa;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* Canvas container variables (default) */
+#canvas {
+  --accent-color: #0d6efd;
+  --component-bg: #ffffff;
+  --component-text: #212529;
+}
+
+/* Canvas drop area */
 .canvas-drop {
   min-height: 240px;
-  background: #fff;
+  background: var(--component-bg);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  padding: var(--canvas-padding);
+  flex-direction: column;
 }
 
+/* preview box in the component list */
 .componente-preview {
-  border: 1px dashed #ced4da;
+  border: 1px dashed rgba(0,0,0,0.08);
   background: #fdfdfd;
-  padding: 12px;
-  border-radius: .5rem;
-}
-
-/* Aparência de página protótipo */
-.prototype-page {
-  width: 100%;
-  max-width: 980px;
-  margin: 0 auto;
-  background: #ffffff;
-  box-shadow: 0 0.5rem 1rem rgba(0,0,0,.08);
-}
-
-.componente-preview {
-  max-height: 120px;       /* limita a altura da preview */
-  height: 120px;
-  overflow: hidden;        /* esconder overflow pois vamos escalar */
-  background: #ffffff;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-  position: relative;
   padding: 8px;
+  border-radius: .5rem;
+  max-height: var(--preview-height);
+  height: var(--preview-height);
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
 }
 
 /* wrapper interno que será escalado */
@@ -43,53 +49,80 @@ body { background-color: #f8f9fa; }
   transition: transform .12s ease;
 }
 
-/* pequena melhoria visual ao passar o mouse */
+/* efeito hover */
 .card.componente-item:hover .componente-preview {
   box-shadow: 0 4px 14px rgba(0,0,0,0.06);
   transform: translateY(-2px);
   transition: box-shadow .18s, transform .18s;
 }
 
-.prototype-block + .prototype-block {
-  /* espaço vertical entre componentes reais */
-  margin-top: 6px;
+/* Aparência de página protótipo */
+.prototype-page {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  background: var(--component-bg, #ffffff);
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,.08);
+  padding: 12px;
 }
 
-/* Rolagem na lista de componentes do editor */
-#lista-componentes {
-  max-height: 70vh;
-  overflow-y: auto;
-  padding-right: 4px; /* espaço para não colar na barra de rolagem */
-}
-
-#canvas {
-  --accent-color: #0d6efd;
-  --component-bg: #ffffff;
-  --component-text: #212529;
-}
-
-/* Aplica as variáveis aos blocos de preview/protótipo */
-.prototype-page,
-.componente-preview .preview-inner,
+/* Blocos dentro do prototype (cada componente solto no canvas) */
 .prototype-block {
-  background-color: var(--component-bg);
-  color: var(--component-text);
+  background-color: var(--component-bg, #ffffff);
+  color: var(--component-text, #212529);
+  transition: box-shadow .12s ease, transform .12s ease, outline .12s ease;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  cursor: pointer;
 }
 
-/* força variação visual para botões primários dentro do preview/prototype */
-.prototype-page .btn-primary,
+/* botão primário dentro do bloco usa a variável local (inline overrides) */
+.prototype-block .btn-primary,
 .componente-preview .preview-inner .btn-primary {
   background-color: var(--accent-color) !important;
   border-color: var(--accent-color) !important;
 }
 
-/* subtle border to show preview area using current bg */
-.componente-preview {
-  border-color: rgba(0,0,0,0.06);
+/* estilo visual quando selecionado - usa cor fixa de seleção (não depende do accent) */
+.prototype-block.selected {
+  outline: 3px solid var(--selection-outline-color, #0d6efd);
+  box-shadow: 0 8px 20px rgba(13,110,253,0.08);
+  transform: translateY(-2px);
+}
+
+/* Protótipo block separator */
+.prototype-block + .prototype-block {
+  margin-top: 12px;
+}
+
+/* Rolagem na lista de componentes do editor */
+#lista-componentes {
+  max-height: calc(100vh - 220px);
+  overflow: auto;
+}
+
+/* Canvas id */
+#canvas {
+  overflow: auto;
+}
+
+/* Aplica as variáveis aos blocos de preview/protótipo para que usem cores locais */
+.prototype-page,
+.componente-preview .preview-inner,
+.prototype-block {
+  background-color: var(--component-bg, #ffffff);
+  color: var(--component-text, #212529);
 }
 
 /* Painel de customização (right column) */
 .card .form-control-color {
   height: 38px;
   padding: .125rem;
+}
+
+/* Pequenas adaptações responsivas */
+@media (max-width: 991.98px) {
+  .prototype-page { max-width: 100%; padding: 8px; }
+  .componente-preview { height: 100px; max-height: 100px; }
 }

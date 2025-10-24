@@ -1,12 +1,11 @@
-// ...existing code...
-// Lógica principal de navegação e interações entre páginas
-// Usa localStorage para manter persona sorteada e componentes escolhidos
-
 (function () {
+  'use strict';
+
   const STORAGE_KEYS = {
     persona: 'simulador_persona',
     componentesEscolhidos: 'simulador_componentes',
-    colorSettings: 'simulador_colors'
+    colorSettings: 'simulador_colors',
+    customColors: 'simulador_custom_colors'
   };
 
   // Cores padrão
@@ -16,6 +15,19 @@
     text: '#212529'
   };
 
+  // Estado de UI
+  const state = {
+    filtroTipo: 'Todos'
+  };
+
+  // seleção de componentes no canvas (IDs)
+  const selectionState = {
+    selectedIds: []
+  };
+
+  // -------------------
+  // Color customizer (global)
+  // -------------------
   function salvarColorSettings(colors) {
     localStorage.setItem(STORAGE_KEYS.colorSettings, JSON.stringify(colors));
   }
@@ -27,12 +39,13 @@
 
   function applyColorSettings(colors) {
     const canvas = document.getElementById('canvas');
-    if (!canvas) return;
-    canvas.style.setProperty('--accent-color', colors.accent);
-    canvas.style.setProperty('--component-bg', colors.background);
-    canvas.style.setProperty('--component-text', colors.text);
-    // também aplica visualmente nas previews (quando estiverem montadas)
-    document.querySelectorAll('.componente-preview .preview-inner, .prototype-page').forEach((el) => {
+    if (canvas) {
+      canvas.style.setProperty('--accent-color', colors.accent);
+      canvas.style.setProperty('--component-bg', colors.background);
+      canvas.style.setProperty('--component-text', colors.text);
+    }
+
+    document.querySelectorAll('.componente-preview .preview-inner, .prototype-page, .prototype-block').forEach((el) => {
       el.style.setProperty('--accent-color', colors.accent);
       el.style.setProperty('--component-bg', colors.background);
       el.style.setProperty('--component-text', colors.text);
@@ -45,9 +58,9 @@
     const inpText = document.getElementById('color-text');
     const btnAplicar = document.getElementById('btn-aplicar-cores');
     const btnReset = document.getElementById('btn-reset-cores');
+
     if (!inpAccent || !inpBg || !inpText) return;
 
-    // carregar valores salvos
     const saved = lerColorSettings();
     inpAccent.value = saved.accent || DEFAULT_COLORS.accent;
     inpBg.value = saved.background || DEFAULT_COLORS.background;
@@ -62,6 +75,9 @@
       };
       salvarColorSettings(colors);
       applyColorSettings(colors);
+      // re-render previews/canvas to pick up any global change for components without custom colors
+      renderListaComponentes();
+      renderCanvasPreview();
     });
 
     btnReset?.addEventListener('click', () => {
@@ -70,74 +86,37 @@
       inpBg.value = DEFAULT_COLORS.background;
       inpText.value = DEFAULT_COLORS.text;
       applyColorSettings(DEFAULT_COLORS);
-    });
-  }
-
-// ...existing code...
-
-   function initEditor() {
-    const canvas = document.getElementById('canvas');
-    if (!canvas) return;
-
-    renderListaComponentes();
-    atualizarOrdemUI();
-    renderCanvasPreview();
-
-    // inicializa customizador de cores (aplica cores já salvas)
-    initCustomizer();
-
-    const btnLimpar = document.getElementById('btn-limpar');
-    btnLimpar?.addEventListener('click', () => {
-      // limpa componentes selecionados
-      salvarComponentesEscolhidos([]);
-      atualizarOrdemUI();
+      renderListaComponentes();
       renderCanvasPreview();
-
-      // resetar cores para os defaults e aplicar
-      salvarColorSettings(DEFAULT_COLORS);
-      applyColorSettings(DEFAULT_COLORS);
-
-      // atualizar inputs do painel de customização (se existirem)
-      const inpAccent = document.getElementById('color-accent');
-      const inpBg = document.getElementById('color-bg');
-      const inpText = document.getElementById('color-text');
-      if (inpAccent) inpAccent.value = DEFAULT_COLORS.accent;
-      if (inpBg) inpBg.value = DEFAULT_COLORS.background;
-      if (inpText) inpText.value = DEFAULT_COLORS.text;
     });
-
-    // --- FILTROS: usa delegação no grupo de botões (mais robusto)
-    const filtroGroup = document.querySelector('[aria-label="Filtro por tipo"]');
-    if (filtroGroup) {
-      filtroGroup.addEventListener('click', (ev) => {
-        const btn = ev.target.closest('[data-filter]');
-        if (!btn) return;
-        // atualiza aparência active
-        filtroGroup.querySelectorAll('[data-filter]').forEach((b) => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        // atualiza estado e re-renderiza lista
-        state.filtroTipo = btn.getAttribute('data-filter') || 'Todos';
-        renderListaComponentes();
-      });
-    } else {
-      // fallback: se o grupo não existir, tenta ligar diretamente aos botões
-      const filtroBotoes = document.querySelectorAll('[data-filter]');
-      filtroBotoes.forEach((btn) => {
-        btn.addEventListener('click', () => {
-          filtroBotoes.forEach((b) => b.classList.remove('active'));
-          btn.classList.add('active');
-          state.filtroTipo = btn.getAttribute('data-filter') || 'Todos';
-          renderListaComponentes();
-        });
-      });
-    }
   }
 
-  const state = {
-    filtroTipo: 'Todos',
-  };
+  // -----------------------
+  // Persistência cores por componente
+  // -----------------------
+  function salvarCustomColors(map) {
+    localStorage.setItem(STORAGE_KEYS.customColors, JSON.stringify(map || {}));
+  }
 
+  function lerCustomColors() {
+    const raw = localStorage.getItem(STORAGE_KEYS.customColors);
+    return raw ? JSON.parse(raw) : {};
+  }
+
+  function getColorsForComponent(id) {
+    const custom = lerCustomColors();
+    const c = custom[String(id)];
+    const global = lerColorSettings();
+    return {
+      accent: (c && c.accent) || global.accent || DEFAULT_COLORS.accent,
+      background: (c && c.background) || global.background || DEFAULT_COLORS.background,
+      text: (c && c.text) || global.text || DEFAULT_COLORS.text
+    };
+  }
+
+  // -------------------
+  // Persona / armazenamento componentes
+  // -------------------
   function salvarPersona(persona) {
     localStorage.setItem(STORAGE_KEYS.persona, JSON.stringify(persona));
   }
@@ -151,16 +130,31 @@
     localStorage.removeItem(STORAGE_KEYS.componentesEscolhidos);
   }
 
+  function lerComponentesEscolhidos() {
+    const raw = localStorage.getItem(STORAGE_KEYS.componentesEscolhidos);
+    return raw ? JSON.parse(raw) : [];
+  }
+
+  function salvarComponentesEscolhidos(listaIds) {
+    localStorage.setItem(STORAGE_KEYS.componentesEscolhidos, JSON.stringify(listaIds));
+  }
+
+  // -------------------
+  // Index / Persona pages
+  // -------------------
   function initIndex() {
     const btn = document.getElementById('btn-comecar');
     if (!btn) return;
     btn.addEventListener('click', () => {
-      // Sorteio simples de persona
-      const indice = Math.floor(Math.random() * window.personas.length);
-      const sorteada = window.personas[indice];
-      salvarPersona(sorteada);
-      limparComponentesEscolhidos();
-      window.location.href = 'persona.html';
+      const indice = Math.floor(Math.random() * (window.personas?.length || 1));
+      const sorteada = (window.personas && window.personas[indice]) || null;
+      if (sorteada) {
+        salvarPersona(sorteada);
+        limparComponentesEscolhidos();
+        window.location.href = 'persona.html';
+      } else {
+        alert('Nenhuma persona disponível.');
+      }
     });
   }
 
@@ -179,115 +173,125 @@
     `;
   }
 
+  // -------------------
+  // Lista de componentes / seleção
+  // -------------------
   function renderListaComponentes() {
-  const lista = document.getElementById('lista-componentes');
-  if (!lista) return;
-  lista.innerHTML = '';
+    const lista = document.getElementById('lista-componentes');
+    if (!lista) return;
+    lista.innerHTML = '';
 
-  const itens = state.filtroTipo === 'Todos'
-    ? window.componentes
-    : window.componentes.filter((c) => {
-        // quando o filtro é "Section", inclui qualquer componente cuja categoria seja Section
+    const itens = state.filtroTipo === 'Todos'
+      ? (window.componentes || [])
+      : (window.componentes || []).filter((c) => {
         if (state.filtroTipo === 'Section') {
-          return c.categoria === 'Section' || c.tipo === 'Section';
+          return c.categoria === 'Section' || c.tipo === 'Section' || c.tipo === 'Hero' || c.tipo === 'Gallery' || c.tipo === 'Contact';
         }
-        // para outros filtros, aceita tanto tipo quanto categoria (flexível)
         return c.tipo === state.filtroTipo || c.categoria === state.filtroTipo;
       });
 
-  itens.forEach((comp) => {
-    const item = document.createElement('div');
-    item.className = 'card componente-item';
-    item.innerHTML = `
-      <div class="card-body p-3">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <div class="fw-semibold">${comp.tipo} ${comp.categoria ? ` · ${comp.categoria}` : ''}</div>
-            <small class="text-muted">Acessibilidade: ${comp.acessibilidade}</small>
+    itens.forEach((comp) => {
+      const item = document.createElement('div');
+      item.className = 'card componente-item';
+      item.innerHTML = `
+        <div class="card-body p-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-semibold">${comp.tipo}${comp.categoria ? ` · ${comp.categoria}` : ''}</div>
+              <small class="text-muted">Acessibilidade: ${comp.acessibilidade || '—'}</small>
+            </div>
+            <span class="badge text-bg-secondary">#${comp.id}</span>
           </div>
-          <span class="badge text-bg-secondary">#${comp.id}</span>
-        </div>
 
-        <div class="mt-2 small">${comp.descricao}</div>
+          <div class="mt-2 small">${comp.descricao || ''}</div>
 
-        <div class="mt-3 componente-preview" data-preview-id="${comp.id}">
-          <div class="preview-inner">
-            ${comp.html || '<div class="text-muted small">Sem preview disponível</div>'}
+          <div class="mt-3 componente-preview" data-preview-id="${comp.id}">
+            <div class="preview-inner">
+              ${comp.html || '<div class="text-muted small">Sem preview disponível</div>'}
+            </div>
+          </div>
+
+          <div class="mt-3 d-flex justify-content-end">
+            <button class="btn btn-sm btn-primary select-btn" data-id="${comp.id}">Selecionar</button>
           </div>
         </div>
+      `;
+      lista.appendChild(item);
 
-        <div class="mt-3 d-flex justify-content-end">
-          <button class="btn btn-sm btn-primary select-btn" data-id="${comp.id}">Selecionar</button>
-        </div>
-      </div>
-    `;
-    lista.appendChild(item);
+      // remove scripts na preview por segurança
+      const previewEl = item.querySelector('.componente-preview');
+      previewEl.querySelectorAll('script').forEach((s) => s.remove());
 
-    // remove scripts na preview e adiciona handler do botão
-    const previewEl = item.querySelector('.componente-preview');
-    previewEl.querySelectorAll('script').forEach((s) => s.remove());
+      // aplicar cores personalizadas (se houver) na pré-visualização
+      const previewInner = item.querySelector('.preview-inner');
+      if (previewInner) {
+        const compColors = getColorsForComponent(comp.id);
+        previewInner.style.setProperty('--accent-color', compColors.accent);
+        previewInner.style.setProperty('--component-bg', compColors.background);
+        previewInner.style.setProperty('--component-text', compColors.text);
+      }
 
-    const btn = item.querySelector('.select-btn');
-    btn?.addEventListener('click', () => {
-      const id = Number(btn.getAttribute('data-id'));
-      window.selectComponent(id);
+      // botão selecionar
+      const btn = item.querySelector('.select-btn');
+      btn?.addEventListener('click', () => {
+        const id = Number(btn.getAttribute('data-id'));
+        window.selectComponent(id);
+      });
     });
+
+    // após render, ajustar escalonamento das previews
+    requestAnimationFrame(adjustAllPreviews);
+  }
+
+  // -------------------
+  // Ajuste de escala das previews
+  // -------------------
+  function adjustPreview(previewEl) {
+    const inner = previewEl.querySelector('.preview-inner');
+    if (!inner) return;
+
+    // reset para medida real
+    inner.style.transform = '';
+    inner.style.width = '';
+    inner.style.display = ''; // garantir bloco para medir
+
+    // dimensões
+    const containerH = previewEl.clientHeight || 120;
+    const contentH = inner.scrollHeight || inner.offsetHeight || 1;
+    const scale = Math.min(1, containerH / contentH);
+
+    inner.style.transformOrigin = 'top left';
+    inner.style.transform = `scale(${scale})`;
+
+    // quando escalado para <1, precisamos aumentar a largura do inner para preencher container
+    inner.style.width = `${100 / (scale || 1)}%`;
+  }
+
+  function adjustAllPreviews() {
+    document.querySelectorAll('.componente-preview').forEach((el) => {
+      try { adjustPreview(el); } catch (e) { /* silent */ }
+    });
+  }
+
+  // debounce resize
+  let __previewResizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(__previewResizeTimer);
+    __previewResizeTimer = setTimeout(adjustAllPreviews, 120);
   });
 
-  requestAnimationFrame(adjustAllPreviews);
-}
-
-// calcula e aplica escala para uma preview para caber no container
-function adjustPreview(previewEl) {
-  const inner = previewEl.querySelector('.preview-inner');
-  if (!inner) return;
-
-  // reset para medir tamanho real
-  inner.style.transform = '';
-  inner.style.width = '';
-
-  // dimensões
-  const containerH = previewEl.clientHeight || 120;
-  const contentH = inner.scrollHeight || inner.offsetHeight || 1;
-  const scale = Math.min(1, containerH / contentH);
-
-  inner.style.transform = `scale(${scale})`;
-
-  // garantir que o conteúdo escalado ocupe a largura do container:
-  // quando escalado para <1, precisamos aumentar a largura do inner para manter layout
-  inner.style.width = `${100 / scale}%`;
-}
-
-// percorre todas as previews na lista e ajusta
-function adjustAllPreviews() {
-  document.querySelectorAll('.componente-preview').forEach((el) => adjustPreview(el));
-}
-
-// recalcula ao redimensionar a janela
-window.addEventListener('resize', () => {
-  // debounce simples
-  clearTimeout(window.__previewResizeTimer);
-  window.__previewResizeTimer = setTimeout(adjustAllPreviews, 120);
-});
-
-  function lerComponentesEscolhidos() {
-    const raw = localStorage.getItem(STORAGE_KEYS.componentesEscolhidos);
-    return raw ? JSON.parse(raw) : [];
-  }
-
-  function salvarComponentesEscolhidos(listaIds) {
-    localStorage.setItem(STORAGE_KEYS.componentesEscolhidos, JSON.stringify(listaIds));
-  }
-
+  // -------------------
+  // Ordem / Canvas render
+  // -------------------
   function atualizarOrdemUI() {
     const ordem = document.getElementById('lista-ordem');
     if (!ordem) return;
     const ids = lerComponentesEscolhidos();
     ordem.innerHTML = '';
     ids.forEach((id) => {
-      const comp = window.componentes.find((c) => c.id === id);
+      const comp = (window.componentes || []).find((c) => c.id === id) || { tipo: `#${id}` };
       const li = document.createElement('li');
-      li.textContent = `${comp.tipo} (${comp.acessibilidade})`;
+      li.textContent = `${comp.tipo} ${comp.acessibilidade ? `(${comp.acessibilidade})` : ''}`;
       ordem.appendChild(li);
     });
   }
@@ -296,31 +300,140 @@ window.addEventListener('resize', () => {
     const canvas = document.getElementById('canvas');
     if (!canvas) return;
     const ids = lerComponentesEscolhidos();
-    if (ids.length === 0) {
+    if (!ids || ids.length === 0) {
       canvas.textContent = 'Clique em "Selecionar" nos componentes para adicioná-los ao canvas';
       canvas.classList.add('text-muted');
+      // limpar seleção visual
+      selectionState.selectedIds = [];
+      updatePerComponentCustomizerUI();
       return;
     }
     canvas.classList.remove('text-muted');
-    // Monta um "protótipo" visual com HTML real dos componentes
+
     const page = document.createElement('div');
     page.className = 'prototype-page';
+    // aplica variáveis de cor no container da página
+    const colors = lerColorSettings();
+    page.style.setProperty('--accent-color', colors.accent);
+    page.style.setProperty('--component-bg', colors.background);
+    page.style.setProperty('--component-text', colors.text);
+
     ids.forEach((id) => {
-      const comp = window.componentes.find((c) => c.id === id);
+      const comp = (window.componentes || []).find((c) => c.id === id);
       const wrapper = document.createElement('div');
       wrapper.className = 'prototype-block';
-      wrapper.innerHTML = comp.html || '';
+      wrapper.setAttribute('data-comp-id', String(id));
+      // aplicar cores por componente (inline CSS variables)
+      const compColors = getColorsForComponent(id);
+      wrapper.style.setProperty('--accent-color', compColors.accent);
+      wrapper.style.setProperty('--component-bg', compColors.background);
+      wrapper.style.setProperty('--component-text', compColors.text);
+      wrapper.innerHTML = comp?.html || `<div style="padding:8px;background:#f8f9fa;border-radius:6px">Componente #${id}</div>`;
+      // clique no bloco: toggle seleção (como checkbox)
+      wrapper.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        toggleSelectedComponent(id);
+      });
+      // aplicar classe selected se já estiver selecionado
+      if (selectionState.selectedIds.includes(id)) wrapper.classList.add('selected');
+
       page.appendChild(wrapper);
     });
+
     canvas.innerHTML = '';
     canvas.appendChild(page);
   }
 
-  // Função pública para selecionar/adicionar componente no canvas
+  // -------------------
+  // Seleção por componente e UI do customizer por componente
+  // -------------------
+  function toggleSelectedComponent(id) {
+    const idx = selectionState.selectedIds.indexOf(id);
+    if (idx >= 0) {
+      selectionState.selectedIds.splice(idx, 1);
+    } else {
+      selectionState.selectedIds.push(id);
+    }
+    updateWrapperSelectionUI();
+    updatePerComponentCustomizerUI();
+  }
+
+  function clearSelectedComponents() {
+    selectionState.selectedIds = [];
+    updateWrapperSelectionUI();
+    updatePerComponentCustomizerUI();
+  }
+
+  function updateWrapperSelectionUI() {
+    document.querySelectorAll('.prototype-block').forEach((el) => {
+      const id = Number(el.getAttribute('data-comp-id'));
+      if (selectionState.selectedIds.includes(id)) el.classList.add('selected');
+      else el.classList.remove('selected');
+    });
+  }
+
+  function updatePerComponentCustomizerUI() {
+    const container = document.getElementById('per-comp-customizer');
+    const noneContainer = document.getElementById('global-customizer');
+    if (!container || !noneContainer) return;
+    if (selectionState.selectedIds.length === 0) {
+      container.classList.add('d-none');
+      noneContainer.classList.remove('d-none');
+      return;
+    }
+    // se há seleção, mostra painel específico
+    container.classList.remove('d-none');
+    noneContainer.classList.add('d-none');
+
+    // preencher inputs com cores do primeiro selecionado
+    const firstId = selectionState.selectedIds[0];
+    const colors = getColorsForComponent(firstId);
+    const a = document.getElementById('comp-color-accent');
+    const b = document.getElementById('comp-color-bg');
+    const t = document.getElementById('comp-color-text');
+    if (a) a.value = colors.accent;
+    if (b) b.value = colors.background;
+    if (t) t.value = colors.text;
+  }
+
+  function applyColorsToSelected() {
+    const a = document.getElementById('comp-color-accent')?.value;
+    const b = document.getElementById('comp-color-bg')?.value;
+    const t = document.getElementById('comp-color-text')?.value;
+    if (!selectionState.selectedIds.length) return;
+    const map = lerCustomColors();
+    selectionState.selectedIds.forEach((id) => {
+      map[String(id)] = { accent: a, background: b, text: t };
+    });
+    salvarCustomColors(map);
+    renderCanvasPreview();
+    renderListaComponentes(); // atualiza previews também
+    updateWrapperSelectionUI();
+  }
+
+  function resetColorsForSelected() {
+    const map = lerCustomColors();
+    selectionState.selectedIds.forEach((id) => {
+      delete map[String(id)];
+    });
+    salvarCustomColors(map);
+    renderCanvasPreview();
+    renderListaComponentes();
+    updateWrapperSelectionUI();
+  }
+
+  // clique fora limpa seleção
+  document.addEventListener('click', (ev) => {
+    const inCanvas = ev.target.closest('#canvas, #per-comp-customizer, #global-customizer, .prototype-block');
+    if (!inCanvas) clearSelectedComponents();
+  });
+
+  // -------------------
+  // Seleção pública (adicionar componente ao canvas)
+  // -------------------
   window.selectComponent = function (id) {
     const ids = lerComponentesEscolhidos();
     if (ids.includes(id)) {
-      // evita duplicatas; altere se quiser permitir múltiplas instâncias
       alert('Componente já selecionado.');
       return;
     }
@@ -330,12 +443,86 @@ window.addEventListener('resize', () => {
     renderCanvasPreview();
   };
 
-  // removidos handlers de drag & drop (não mais usados)
+  // -------------------
+  // Editor init
+  // -------------------
+  function initEditor() {
+    const canvas = document.getElementById('canvas');
+    if (!canvas) return;
 
-  // Bootstrap das páginas
+    renderListaComponentes();
+    atualizarOrdemUI();
+    renderCanvasPreview();
+    initCustomizer();
+
+    const btnLimpar = document.getElementById('btn-limpar');
+    btnLimpar?.addEventListener('click', () => {
+      // limpa componentes selecionados
+      salvarComponentesEscolhidos([]);
+      atualizarOrdemUI();
+      renderCanvasPreview();
+
+      // resetar cores globais e per-componentes
+      salvarColorSettings(DEFAULT_COLORS);
+      applyColorSettings(DEFAULT_COLORS);
+      salvarCustomColors({});
+
+      // atualizar inputs do painel de customização (se existirem)
+      const inpAccent = document.getElementById('color-accent');
+      const inpBg = document.getElementById('color-bg');
+      const inpText = document.getElementById('color-text');
+      if (inpAccent) inpAccent.value = DEFAULT_COLORS.accent;
+      if (inpBg) inpBg.value = DEFAULT_COLORS.background;
+      if (inpText) inpText.value = DEFAULT_COLORS.text;
+
+      clearSelectedComponents();
+    });
+
+    // FILTROS: delegação no grupo de botões
+    const filtroGroup = document.querySelector('[aria-label="Filtro por tipo"]');
+    if (filtroGroup) {
+      filtroGroup.addEventListener('click', (ev) => {
+        const btn = ev.target.closest('[data-filter]');
+        if (!btn) return;
+        filtroGroup.querySelectorAll('[data-filter]').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.filtroTipo = btn.getAttribute('data-filter') || 'Todos';
+        renderListaComponentes();
+      });
+    } else {
+      // fallback: attach directly
+      const filtroBotoes = document.querySelectorAll('[data-filter]');
+      filtroBotoes.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          filtroBotoes.forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.filtroTipo = btn.getAttribute('data-filter') || 'Todos';
+          renderListaComponentes();
+        });
+      });
+    }
+
+    // ligar botões do customizador por componente
+    const btnCompApply = document.getElementById('btn-comp-aplicar');
+    const btnCompReset = document.getElementById('btn-comp-resetar');
+    const btnCompApplyAlt = document.getElementById('btn-comp-aplicar'); // fallback id used in some snippet names
+    const btnCompResetAlt = document.getElementById('btn-comp-resetar');
+    (btnCompApply || btnCompApplyAlt)?.addEventListener('click', (e) => {
+      e.preventDefault();
+      applyColorsToSelected();
+    });
+    (btnCompReset || btnCompResetAlt)?.addEventListener('click', (e) => {
+      e.preventDefault();
+      resetColorsForSelected();
+    });
+  }
+
+  // -------------------
+  // Boot
+  // -------------------
   document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname;
-    if (path.endsWith('index.html') || path.endsWith('/projeto-layout/') || path.endsWith('/projeto-layout')) {
+    if (path.endsWith('index.html') || path.endsWith('/') || path.endsWith('\\')) {
       initIndex();
     } else if (path.endsWith('persona.html')) {
       initPersona();
