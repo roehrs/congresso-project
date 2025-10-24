@@ -115,7 +115,8 @@ const componentes = [
   },
   {
     id: 3,
-    tipo: "Section",
+    tipo: "Hero",
+    categoria: "Section",
     acessibilidade: "alta",
     descricao: "Hero com texto grande e espaçamento generoso",
     html: `
@@ -129,7 +130,8 @@ const componentes = [
   },
   {
     id: 4,
-    tipo: "Section",
+    tipo: "Hero",
+    categoria: "Section",
     acessibilidade: "media",
     descricao: "Hero moderno com boa hierarquia visual",
     html: `
@@ -164,7 +166,8 @@ const componentes = [
   },
   {
     id: 11,
-    tipo: "Section",
+    tipo: "Cards informativos",
+    categoria: "Section",
     acessibilidade: "media",
     descricao: "Seção com cards informativos e hierarquia visual",
     html: `

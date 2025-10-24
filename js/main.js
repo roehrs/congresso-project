@@ -57,9 +57,17 @@
   const lista = document.getElementById('lista-componentes');
   if (!lista) return;
   lista.innerHTML = '';
+
   const itens = state.filtroTipo === 'Todos'
     ? window.componentes
-    : window.componentes.filter((c) => c.tipo === state.filtroTipo);
+    : window.componentes.filter((c) => {
+        // quando o filtro é "Section", inclui qualquer componente cuja categoria seja Section
+        if (state.filtroTipo === 'Section') {
+          return c.categoria === 'Section' || c.tipo === 'Section';
+        }
+        // para outros filtros, aceita tanto tipo quanto categoria (flexível)
+        return c.tipo === state.filtroTipo || c.categoria === state.filtroTipo;
+      });
 
   itens.forEach((comp) => {
     const item = document.createElement('div');
@@ -68,7 +76,7 @@
       <div class="card-body p-3">
         <div class="d-flex justify-content-between align-items-center">
           <div>
-            <div class="fw-semibold">${comp.tipo}</div>
+            <div class="fw-semibold">${comp.tipo} ${comp.categoria ? ` · ${comp.categoria}` : ''}</div>
             <small class="text-muted">Acessibilidade: ${comp.acessibilidade}</small>
           </div>
           <span class="badge text-bg-secondary">#${comp.id}</span>
@@ -76,7 +84,6 @@
 
         <div class="mt-2 small">${comp.descricao}</div>
 
-        <!-- Preview visual do componente -->
         <div class="mt-3 componente-preview" data-preview-id="${comp.id}">
           <div class="preview-inner">
             ${comp.html || '<div class="text-muted small">Sem preview disponível</div>'}
@@ -90,11 +97,10 @@
     `;
     lista.appendChild(item);
 
-    // evita execução/efeitos colaterais de scripts (caso existam) — remove qualquer <script>
+    // remove scripts na preview e adiciona handler do botão
     const previewEl = item.querySelector('.componente-preview');
     previewEl.querySelectorAll('script').forEach((s) => s.remove());
 
-    // adiciona listener ao botão Selecionar
     const btn = item.querySelector('.select-btn');
     btn?.addEventListener('click', () => {
       const id = Number(btn.getAttribute('data-id'));
@@ -102,7 +108,6 @@
     });
   });
 
-  // ajusta escala das previews após inserção
   requestAnimationFrame(adjustAllPreviews);
 }
 
