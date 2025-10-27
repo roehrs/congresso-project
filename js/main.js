@@ -422,6 +422,30 @@
     updateWrapperSelectionUI();
   }
 
+  // -------------------
+  // Excluir componente(s) selecionado(s) do canvas
+  // -------------------
+  function excluirSelectedFromCanvas() {
+    if (!selectionState.selectedIds.length) {
+      alert('Nenhum componente selecionado para excluir.');
+      return;
+    }
+    const confirmMsg = selectionState.selectedIds.length === 1
+      ? 'Excluir o componente selecionado do canvas?'
+      : `Excluir ${selectionState.selectedIds.length} componentes selecionados do canvas?`;
+    if (!confirm(confirmMsg)) return;
+
+    const ids = lerComponentesEscolhidos();
+    const filtered = ids.filter((id) => !selectionState.selectedIds.includes(id));
+    salvarComponentesEscolhidos(filtered);
+
+    // atualizar UI
+    atualizarOrdemUI();
+    renderCanvasPreview();
+    renderListaComponentes();
+    clearSelectedComponents();
+  }
+
   // clique fora limpa seleção
   document.addEventListener('click', (ev) => {
     const inCanvas = ev.target.closest('#canvas, #per-comp-customizer, #global-customizer, .prototype-block');
@@ -505,15 +529,18 @@
     // ligar botões do customizador por componente
     const btnCompApply = document.getElementById('btn-comp-aplicar');
     const btnCompReset = document.getElementById('btn-comp-resetar');
-    const btnCompApplyAlt = document.getElementById('btn-comp-aplicar'); // fallback id used in some snippet names
-    const btnCompResetAlt = document.getElementById('btn-comp-resetar');
-    (btnCompApply || btnCompApplyAlt)?.addEventListener('click', (e) => {
+    const btnCompDelete = document.getElementById('btn-comp-excluir');
+    (btnCompApply)?.addEventListener('click', (e) => {
       e.preventDefault();
       applyColorsToSelected();
     });
-    (btnCompReset || btnCompResetAlt)?.addEventListener('click', (e) => {
+    (btnCompReset)?.addEventListener('click', (e) => {
       e.preventDefault();
       resetColorsForSelected();
+    });
+    (btnCompDelete)?.addEventListener('click', (e) => {
+      e.preventDefault();
+      excluirSelectedFromCanvas();
     });
   }
 
