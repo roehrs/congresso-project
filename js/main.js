@@ -10,19 +10,16 @@
     difficulty: 'simulador_difficulty'
   };
 
-  // Cores padrão
   const DEFAULT_COLORS = {
     accent: '#0d6efd',
     background: '#ffffff',
     text: '#212529'
   };
 
-  // Estado de UI
   const state = {
     filtroTipo: 'Todos'
   };
 
-  // seleção de componentes no canvas (IDs)
   const selectionState = {
     selectedIds: []
   };
@@ -46,7 +43,6 @@
       canvas.style.setProperty('--component-bg', colors.background);
       canvas.style.setProperty('--component-text', colors.text);
     }
-
     document.querySelectorAll('.componente-preview .preview-inner, .prototype-page, .prototype-block').forEach((el) => {
       el.style.setProperty('--accent-color', colors.accent);
       el.style.setProperty('--component-bg', colors.background);
@@ -70,11 +66,7 @@
     applyColorSettings(saved);
 
     btnAplicar?.addEventListener('click', () => {
-      const colors = {
-        accent: inpAccent.value,
-        background: inpBg.value,
-        text: inpText.value
-      };
+      const colors = { accent: inpAccent.value, background: inpBg.value, text: inpText.value };
       salvarColorSettings(colors);
       applyColorSettings(colors);
       renderListaComponentes();
@@ -147,11 +139,14 @@
     const btn = document.getElementById('btn-comecar');
     if (!btn) return;
     btn.addEventListener('click', () => {
-      const dif = document.querySelector('input[name="dificuldade"]:checked')?.value || 'facil';
+      const select = document.getElementById('select-dificuldade');
+      const radio = document.querySelector('input[name="dificuldade"]:checked');
+      const dif = select?.value || radio?.value || 'facil';
+
       let retries = 0;
-      if (dif === 'facil') retries = 2;
-      else if (dif === 'medio') retries = 1;
-      else retries = 0;
+      if (dif === 'facil') retries = 3;
+      else if (dif === 'medio') retries = 2;
+      else retries = 1;
 
       localStorage.setItem(STORAGE_KEYS.difficulty, dif);
       localStorage.setItem(STORAGE_KEYS.retries, String(retries));
@@ -169,19 +164,81 @@
   }
 
   function initPersona() {
-    const alvo = document.getElementById('persona-conteudo');
-    if (!alvo) return;
-    const persona = lerPersona();
-    if (!persona) {
-      alvo.innerHTML = '<div class="alert alert-warning">Nenhuma persona encontrada. Volte e comece novamente.</div>';
-      return;
-    }
-    alvo.innerHTML = `
-      <div class="mb-2"><strong>Nome:</strong> ${persona.nome}</div>
-      <div class="mb-2"><strong>Briefing:</strong> ${persona.briefing}</div>
-      <div class="mb-0"><strong>Preferência de acessibilidade:</strong> ${persona.preferencia}</div>
-    `;
+  const alvo = document.getElementById('persona-conteudo');
+  if (!alvo) return;
+  const persona = lerPersona();
+  if (!persona) {
+    alvo.innerHTML = '<div class="alert alert-warning">Nenhuma persona encontrada. Volte e comece novamente.</div>';
+    return;
   }
+
+  const nomeCompleto = persona.nomeCompleto
+    || ((persona.nome || '') + (persona.sobrenome ? (' ' + persona.sobrenome) : ''))
+    || persona.nome
+    || '—';
+
+  // foto/ avatar (aceita persona.photo, persona.foto, persona.avatar)
+  let foto = persona.photo || persona.foto || persona.avatar || '';
+  const isValidUrl = (u) => typeof u === 'string' && (u.startsWith('http://') || u.startsWith('https://') || u.startsWith('/'));
+  if (!isValidUrl(foto)) {
+    const label = encodeURIComponent(nomeCompleto);
+    foto = `https://via.placeholder.com/240x240.png?text=${label}`;
+  }
+
+  // idade e trabalho (fallbacks)
+  const idade = (persona.idade || persona.age) ? `${persona.idade || persona.age} anos` : null;
+  const trabalho = persona.profissao || persona.trabalho || persona.role || persona.ocupacao || null;
+
+  // gostos/hobbies (array) e briefing
+  const gostos = Array.isArray(persona.gostos) ? persona.gostos : (persona.likes ? (Array.isArray(persona.likes) ? persona.likes : [persona.likes]) : []);
+  const briefing = persona.briefing || persona.description || persona.summary || '';
+
+  // preferência (por acessibilidade)
+  const preferencia = persona.preferencia || persona.preference || '—';
+
+  // inline style para aumentar imagem (240x240) e garantir object-fit
+  const imgStyle = 'width:240px;height:240px;object-fit:cover;border-radius:12px;border:2px solid rgba(0,0,0,0.06);';
+
+  const html = `
+    <div class="persona-card">
+      <div>
+        <img src="${foto}"
+             alt="Foto de ${nomeCompleto}"
+             loading="lazy"
+             style="${imgStyle}"
+             class="persona-avatar shadow-sm"
+             onerror="this.onerror=null;this.src='https://via.placeholder.com/240x240.png?text=${encodeURIComponent(nomeCompleto)}'">
+      </div>
+      <div>
+        <div class="persona-name">${nomeCompleto}</div>
+        ${trabalho ? `<div class="persona-role">${trabalho}${idade ? ` • ${idade}` : ''}</div>` : (idade ? `<div class="persona-role">${idade}</div>` : '')}
+        <div class="persona-meta mb-2">${briefing}</div>
+
+        <div class="persona-section-title">Preferências</div>
+        <div class="mb-2">
+          <small class="text-muted">Acessibilidade / preferência:</small>
+          <div class="fw-semibold">${preferencia}</div>
+        </div>
+
+        ${gostos.length ? `
+          <div class="persona-section-title">Gostos / Hobbies</div>
+          <div class="persona-badges mb-2">
+            ${gostos.map((g) => `<span class="badge bg-light text-dark">${String(g)}</span>`).join(' ')}
+          </div>` : ''}
+
+        ${persona.demografia || persona.location ? `
+          <div class="persona-section-title">Demografia</div>
+          <div class="persona-meta">${persona.demografia || persona.location}</div>` : ''}
+
+        ${persona.contact ? `
+          <div class="persona-section-title">Contato (exemplo)</div>
+          <div class="persona-meta">${persona.contact}</div>` : ''}
+      </div>
+    </div>
+  `;
+
+  alvo.innerHTML = html;
+}
 
   // -------------------
   // Lista de componentes / seleção
@@ -347,11 +404,8 @@
   // -------------------
   function toggleSelectedComponent(id) {
     const idx = selectionState.selectedIds.indexOf(id);
-    if (idx >= 0) {
-      selectionState.selectedIds.splice(idx, 1);
-    } else {
-      selectionState.selectedIds.push(id);
-    }
+    if (idx >= 0) selectionState.selectedIds.splice(idx, 1);
+    else selectionState.selectedIds.push(id);
     updateWrapperSelectionUI();
     updatePerComponentCustomizerUI();
   }
@@ -441,6 +495,7 @@
     clearSelectedComponents();
   }
 
+  // clique fora limpa seleção
   document.addEventListener('click', (ev) => {
     const inCanvas = ev.target.closest('#canvas, #per-comp-customizer, #global-customizer, .prototype-block');
     if (!inCanvas) clearSelectedComponents();
@@ -546,6 +601,6 @@
     }
   });
 
-  // expose some helpers if needed
+  // helpers export
   window._simulador_keys = STORAGE_KEYS;
 })();
