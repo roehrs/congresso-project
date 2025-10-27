@@ -404,7 +404,7 @@ const componentes = [
     acessibilidade: "alta",
     descricao: "Footer simples, alto contraste e leitura clara",
     html: `
-<footer class="bg-dark text-white py-4 mt-4">
+<footer class="bg-dark text-white py-4">
   <div class="container d-flex justify-content-between align-items-center">
     <div class="fw-semibold">Rodapé Acessível</div>
     <div>
@@ -420,7 +420,7 @@ const componentes = [
     acessibilidade: "media",
     descricao: "Footer claro com links e coluna de contato",
     html: `
-<footer class="bg-light py-5 mt-4 border-top">
+<footer class="bg-light py-5 border-top">
   <div class="container">
     <div class="row g-4">
       <div class="col-md-4">
@@ -468,7 +468,7 @@ const componentes = [
     acessibilidade: "alta",
     descricao: "Footer escuro com newsletter e forte contraste",
     html: `
-<footer class="bg-dark text-white py-5 mt-4">
+<footer class="bg-dark text-white py-5">
   <div class="container">
     <div class="row g-4 align-items-center">
       <div class="col-md-6">
@@ -508,4 +508,3 @@ const componentes = [
 ];
 
 window.componentes = componentes;
-

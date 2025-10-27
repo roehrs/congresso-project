@@ -1,8 +1,10 @@
-// Lógica de avaliação da combinação persona x componentes (integrado com avaliação de ordem)
+// Lógica de avaliação da combinação persona x componentes (integrado com avaliação de ordem + render do site montado)
 (function () {
   const STORAGE_KEYS = {
     persona: 'simulador_persona',
     componentesEscolhidos: 'simulador_componentes',
+    colorSettings: 'simulador_colors',
+    customColors: 'simulador_custom_colors'
   };
 
   function lerPersona() {
@@ -13,6 +15,16 @@
   function lerComponentesEscolhidos() {
     const raw = localStorage.getItem(STORAGE_KEYS.componentesEscolhidos);
     return raw ? JSON.parse(raw) : [];
+  }
+
+  function lerColorSettings() {
+    const raw = localStorage.getItem(STORAGE_KEYS.colorSettings);
+    return raw ? JSON.parse(raw) : { accent: '#0d6efd', background: '#ffffff', text: '#212529' };
+  }
+
+  function lerCustomColors() {
+    const raw = localStorage.getItem(STORAGE_KEYS.customColors);
+    return raw ? JSON.parse(raw) : {};
   }
 
   // -----------------------------
@@ -225,12 +237,67 @@
     return { score, feedback, ordemEvaluation: ordemResult };
   }
 
+  // ----------------------------
+  // Render do site montado (resultado)
+  // ----------------------------
+  function sanitizeHtml(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html || '';
+    tmp.querySelectorAll('script').forEach((s) => s.remove());
+    return tmp.innerHTML;
+  }
+
+  function renderAssembledSite(ids, targetElId = 'resultado-canvas') {
+    const container = document.getElementById(targetElId);
+    if (!container) return;
+    container.innerHTML = '';
+
+    const comps = window.componentes || [];
+    const colorsGlobal = lerColorSettings();
+    const customMap = lerCustomColors();
+
+    const page = document.createElement('div');
+    page.className = 'prototype-page';
+    page.style.setProperty('--accent-color', colorsGlobal.accent);
+    page.style.setProperty('--component-bg', colorsGlobal.background);
+    page.style.setProperty('--component-text', colorsGlobal.text);
+
+    // montar blocos na ordem
+    ids.forEach((id) => {
+      const comp = comps.find((c) => c.id === id);
+      const wrapper = document.createElement('div');
+      wrapper.className = 'prototype-block';
+      wrapper.setAttribute('data-comp-id', String(id));
+
+      // cores personalizadas por componente (se existirem)
+      const custom = customMap[String(id)];
+      if (custom) {
+        wrapper.style.setProperty('--accent-color', custom.accent || colorsGlobal.accent);
+        wrapper.style.setProperty('--component-bg', custom.background || colorsGlobal.background);
+        wrapper.style.setProperty('--component-text', custom.text || colorsGlobal.text);
+      } else {
+        wrapper.style.setProperty('--accent-color', colorsGlobal.accent);
+        wrapper.style.setProperty('--component-bg', colorsGlobal.background);
+        wrapper.style.setProperty('--component-text', colorsGlobal.text);
+      }
+
+      wrapper.innerHTML = sanitizeHtml(comp?.html || `<div style="padding:8px;background:#f1f3f5;border-radius:6px">Componente #${id}</div>`);
+      page.appendChild(wrapper);
+    });
+
+    container.appendChild(page);
+  }
+
+  // -------------------------
+  // Render UI de resultado (pontuação + canvas)
+  // -------------------------
   function renderResultado() {
     const spanPersona = document.getElementById('resultado-persona');
     const spanPrefer = document.getElementById('resultado-prefer');
     const spanPont = document.getElementById('pontuacao');
     const listaFb = document.getElementById('lista-feedback');
-    if (!spanPersona || !spanPrefer || !spanPont || !listaFb) return;
+    const canvasTarget = document.getElementById('resultado-canvas');
+    if (!spanPersona || !spanPrefer || !spanPont || !listaFb || !canvasTarget) return;
 
     const persona = lerPersona();
     const ids = lerComponentesEscolhidos();
@@ -239,13 +306,14 @@
       spanPersona.textContent = '—';
       spanPrefer.textContent = '—';
       listaFb.innerHTML = '<li>Nenhuma persona encontrada. Volte ao início.</li>';
+      canvasTarget.innerHTML = '';
       return;
     }
 
     spanPersona.textContent = persona.nome;
     spanPrefer.textContent = persona.preferencia;
 
-    const { score, feedback } = avaliar(persona, ids);
+    const { score, feedback, ordemEvaluation } = avaliar(persona, ids);
     spanPont.textContent = String(score);
     listaFb.innerHTML = '';
     feedback.forEach((f) => {
@@ -253,6 +321,15 @@
       li.textContent = f;
       listaFb.appendChild(li);
     });
+
+    // renderiza o site montado no canvas da página de resultado
+    renderAssembledSite(ids, 'resultado-canvas');
+
+    // opcional: mostrar detalhes da avaliação de ordem (colapsível)
+    const ordemDetails = document.getElementById('ordem-details');
+    if (ordemDetails) {
+      ordemDetails.innerHTML = `<pre style="white-space:pre-wrap">${JSON.stringify(ordemEvaluation, null, 2)}</pre>`;
+    }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -267,4 +344,5 @@
   window.avaliacao.avaliar = avaliar;
   window.avaliacao.avaliarOrdem = avaliarOrdem;
   window.avaliacao.avaliarLayoutOrdem = avaliarLayoutOrdem;
+  window.avaliacao.renderAssembledSite = renderAssembledSite;
 })();
