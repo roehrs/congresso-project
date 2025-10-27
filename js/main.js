@@ -5,7 +5,9 @@
     persona: 'simulador_persona',
     componentesEscolhidos: 'simulador_componentes',
     colorSettings: 'simulador_colors',
-    customColors: 'simulador_custom_colors'
+    customColors: 'simulador_custom_colors',
+    retries: 'simulador_retries',
+    difficulty: 'simulador_difficulty'
   };
 
   // Cores padrão
@@ -75,7 +77,6 @@
       };
       salvarColorSettings(colors);
       applyColorSettings(colors);
-      // re-render previews/canvas to pick up any global change for components without custom colors
       renderListaComponentes();
       renderCanvasPreview();
     });
@@ -146,11 +147,20 @@
     const btn = document.getElementById('btn-comecar');
     if (!btn) return;
     btn.addEventListener('click', () => {
+      const dif = document.querySelector('input[name="dificuldade"]:checked')?.value || 'facil';
+      let retries = 0;
+      if (dif === 'facil') retries = 2;
+      else if (dif === 'medio') retries = 1;
+      else retries = 0;
+
+      localStorage.setItem(STORAGE_KEYS.difficulty, dif);
+      localStorage.setItem(STORAGE_KEYS.retries, String(retries));
+
       const indice = Math.floor(Math.random() * (window.personas?.length || 1));
       const sorteada = (window.personas && window.personas[indice]) || null;
       if (sorteada) {
         salvarPersona(sorteada);
-        limparComponentesEscolhidos();
+        salvarComponentesEscolhidos([]);
         window.location.href = 'persona.html';
       } else {
         alert('Nenhuma persona disponível.');
@@ -218,11 +228,9 @@
       `;
       lista.appendChild(item);
 
-      // remove scripts na preview por segurança
       const previewEl = item.querySelector('.componente-preview');
       previewEl.querySelectorAll('script').forEach((s) => s.remove());
 
-      // aplicar cores personalizadas (se houver) na pré-visualização
       const previewInner = item.querySelector('.preview-inner');
       if (previewInner) {
         const compColors = getColorsForComponent(comp.id);
@@ -231,7 +239,6 @@
         previewInner.style.setProperty('--component-text', compColors.text);
       }
 
-      // botão selecionar
       const btn = item.querySelector('.select-btn');
       btn?.addEventListener('click', () => {
         const id = Number(btn.getAttribute('data-id'));
@@ -239,7 +246,6 @@
       });
     });
 
-    // após render, ajustar escalonamento das previews
     requestAnimationFrame(adjustAllPreviews);
   }
 
@@ -250,20 +256,16 @@
     const inner = previewEl.querySelector('.preview-inner');
     if (!inner) return;
 
-    // reset para medida real
     inner.style.transform = '';
     inner.style.width = '';
-    inner.style.display = ''; // garantir bloco para medir
+    inner.style.display = '';
 
-    // dimensões
     const containerH = previewEl.clientHeight || 120;
     const contentH = inner.scrollHeight || inner.offsetHeight || 1;
     const scale = Math.min(1, containerH / contentH);
 
     inner.style.transformOrigin = 'top left';
     inner.style.transform = `scale(${scale})`;
-
-    // quando escalado para <1, precisamos aumentar a largura do inner para preencher container
     inner.style.width = `${100 / (scale || 1)}%`;
   }
 
@@ -273,7 +275,6 @@
     });
   }
 
-  // debounce resize
   let __previewResizeTimer = null;
   window.addEventListener('resize', () => {
     clearTimeout(__previewResizeTimer);
@@ -303,7 +304,6 @@
     if (!ids || ids.length === 0) {
       canvas.textContent = 'Clique em "Selecionar" nos componentes para adicioná-los ao canvas';
       canvas.classList.add('text-muted');
-      // limpar seleção visual
       selectionState.selectedIds = [];
       updatePerComponentCustomizerUI();
       return;
@@ -312,7 +312,6 @@
 
     const page = document.createElement('div');
     page.className = 'prototype-page';
-    // aplica variáveis de cor no container da página
     const colors = lerColorSettings();
     page.style.setProperty('--accent-color', colors.accent);
     page.style.setProperty('--component-bg', colors.background);
@@ -323,18 +322,17 @@
       const wrapper = document.createElement('div');
       wrapper.className = 'prototype-block';
       wrapper.setAttribute('data-comp-id', String(id));
-      // aplicar cores por componente (inline CSS variables)
       const compColors = getColorsForComponent(id);
       wrapper.style.setProperty('--accent-color', compColors.accent);
       wrapper.style.setProperty('--component-bg', compColors.background);
       wrapper.style.setProperty('--component-text', compColors.text);
       wrapper.innerHTML = comp?.html || `<div style="padding:8px;background:#f8f9fa;border-radius:6px">Componente #${id}</div>`;
-      // clique no bloco: toggle seleção (como checkbox)
+
       wrapper.addEventListener('click', (ev) => {
         ev.stopPropagation();
         toggleSelectedComponent(id);
       });
-      // aplicar classe selected se já estiver selecionado
+
       if (selectionState.selectedIds.includes(id)) wrapper.classList.add('selected');
 
       page.appendChild(wrapper);
@@ -381,11 +379,9 @@
       noneContainer.classList.remove('d-none');
       return;
     }
-    // se há seleção, mostra painel específico
     container.classList.remove('d-none');
     noneContainer.classList.add('d-none');
 
-    // preencher inputs com cores do primeiro selecionado
     const firstId = selectionState.selectedIds[0];
     const colors = getColorsForComponent(firstId);
     const a = document.getElementById('comp-color-accent');
@@ -407,7 +403,7 @@
     });
     salvarCustomColors(map);
     renderCanvasPreview();
-    renderListaComponentes(); // atualiza previews também
+    renderListaComponentes();
     updateWrapperSelectionUI();
   }
 
@@ -439,14 +435,12 @@
     const filtered = ids.filter((id) => !selectionState.selectedIds.includes(id));
     salvarComponentesEscolhidos(filtered);
 
-    // atualizar UI
     atualizarOrdemUI();
     renderCanvasPreview();
     renderListaComponentes();
     clearSelectedComponents();
   }
 
-  // clique fora limpa seleção
   document.addEventListener('click', (ev) => {
     const inCanvas = ev.target.closest('#canvas, #per-comp-customizer, #global-customizer, .prototype-block');
     if (!inCanvas) clearSelectedComponents();
@@ -481,17 +475,14 @@
 
     const btnLimpar = document.getElementById('btn-limpar');
     btnLimpar?.addEventListener('click', () => {
-      // limpa componentes selecionados
       salvarComponentesEscolhidos([]);
       atualizarOrdemUI();
       renderCanvasPreview();
 
-      // resetar cores globais e per-componentes
       salvarColorSettings(DEFAULT_COLORS);
       applyColorSettings(DEFAULT_COLORS);
       salvarCustomColors({});
 
-      // atualizar inputs do painel de customização (se existirem)
       const inpAccent = document.getElementById('color-accent');
       const inpBg = document.getElementById('color-bg');
       const inpText = document.getElementById('color-text');
@@ -502,7 +493,6 @@
       clearSelectedComponents();
     });
 
-    // FILTROS: delegação no grupo de botões
     const filtroGroup = document.querySelector('[aria-label="Filtro por tipo"]');
     if (filtroGroup) {
       filtroGroup.addEventListener('click', (ev) => {
@@ -514,7 +504,6 @@
         renderListaComponentes();
       });
     } else {
-      // fallback: attach directly
       const filtroBotoes = document.querySelectorAll('[data-filter]');
       filtroBotoes.forEach((btn) => {
         btn.addEventListener('click', () => {
@@ -526,7 +515,6 @@
       });
     }
 
-    // ligar botões do customizador por componente
     const btnCompApply = document.getElementById('btn-comp-aplicar');
     const btnCompReset = document.getElementById('btn-comp-resetar');
     const btnCompDelete = document.getElementById('btn-comp-excluir');
@@ -557,4 +545,7 @@
       initEditor();
     }
   });
+
+  // expose some helpers if needed
+  window._simulador_keys = STORAGE_KEYS;
 })();

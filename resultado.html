@@ -10,32 +10,28 @@
       /* adaptações para a página de resultado */
       #resultado-canvas { min-height: 420px; border: 1px solid rgba(0,0,0,0.06); padding: 12px; background: #fff; }
 
-      /* faz com que as duas colunas tenham altura igual em telas grandes */
       @media (min-width: 992px) {
         .row-eq > [class*='col-'] { display: flex; }
         .card.h-100 { display: flex; flex-direction: column; width: 100%; }
         #resultado-canvas { flex: 1 1 auto; }
       }
 
-      /* pequena melhora no overflow do canvas */
       #resultado-canvas .prototype-page { 
         max-width: 100%;
-        margin: 0;            /* remove centragem automatico */
-        padding: 0;           /* remove padding extra da página protótipo */
-        box-shadow: none;     /* remove sombra que cria "efeito de bloco" */
-        background: transparent; /* deixa o canvas controlar o fundo */
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        background: transparent;
       }
 
-      /* Remove espaçamento extra entre blocos para que ocupem toda a largura */
       #resultado-canvas .prototype-block {
-        margin: 0;            /* remove margin-top / margin-bottom extras */
-        border-radius: 0;     /* opcional: remove arredondamento se preferir */
-        padding: 0;           /* deixa o conteúdo interno controlar espaçamento */
-        box-shadow: none;     /* remove sombra local se houver */
+        margin: 0;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
         width: 100%;
       }
 
-      /* Caso os componentes internos precisem de algum espaçamento, use o seletor interno */
       #resultado-canvas .prototype-block > * {
         width: 100%;
       }
@@ -67,7 +63,7 @@
               <div id="resultado-canvas" class="mb-3"></div>
 
               <div class="mt-2">
-                <small class="text-muted">Use "Encerrar" no painel à direita para voltar ao início.</small>
+                <small class="text-muted">Use "Tentar novamente" (se disponível) ou "Encerrar" para voltar ao início.</small>
               </div>
             </div>
           </div>
@@ -102,11 +98,14 @@
 
               <details id="ordem-details" class="mb-3">
                 <summary class="small">Detalhes da avaliação de ordem</summary>
-                <!-- preenchido via JS -->
               </details>
 
+              <div class="small text-muted mb-2">
+                Tentativas restantes: <span id="tentativas-restantes">0</span>
+              </div>
+
               <div class="mt-auto d-flex gap-2">
-                <a href="editor.html" class="btn btn-outline-secondary btn-sm">Voltar ao Editor</a>
+                <button id="btn-tentar" class="btn btn-warning btn-sm d-none">Tentar novamente</button>
                 <button id="btn-encerrar" class="btn btn-primary btn-sm">Encerrar</button>
               </div>
             </div>
@@ -119,10 +118,46 @@
     <script src="js/componentes-extra.js"></script>
     <script src="js/avaliacao.js"></script>
     <script>
-      document.getElementById('btn-encerrar')?.addEventListener('click', () => {
-        // volta para a página inicial
-        window.location.href = 'index.html';
-      });
+      (function () {
+        const KEY = 'simulador_retries';
+        function getRetries() {
+          const raw = localStorage.getItem(KEY);
+          const n = raw ? parseInt(raw, 10) : 0;
+          return Number.isFinite(n) ? n : 0;
+        }
+
+        function setRetries(n) {
+          localStorage.setItem(KEY, String(Math.max(0, Number(n) || 0)));
+        }
+
+        function updateUI() {
+          const r = getRetries();
+          const tentSpan = document.getElementById('tentativas-restantes');
+          if (tentSpan) tentSpan.textContent = String(r);
+          const btn = document.getElementById('btn-tentar');
+          if (btn) {
+            if (r > 0) btn.classList.remove('d-none');
+            else btn.classList.add('d-none');
+          }
+        }
+
+        document.getElementById('btn-tentar')?.addEventListener('click', () => {
+          const r = getRetries();
+          if (r <= 0) return;
+          setRetries(r - 1);
+          localStorage.setItem('simulador_componentes', JSON.stringify([]));
+          window.location.href = 'editor.html';
+        });
+
+        document.getElementById('btn-encerrar')?.addEventListener('click', () => {
+          window.location.href = 'index.html';
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+          updateUI();
+        });
+        updateUI();
+      })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </body>
