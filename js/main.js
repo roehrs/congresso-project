@@ -727,7 +727,7 @@
   }
 
   // idade e trabalho (fallbacks)
-  const idade = (persona.idade || persona.age) ? `${persona.idade || persona.age} anos` : null;
+  const idade = (persona.idade || persona.age) ? String(persona.idade || persona.age) : null;
   const trabalho = persona.profissao || persona.trabalho || persona.role || persona.ocupacao || null;
 
   // gostos/hobbies (array) e briefing
@@ -736,44 +736,44 @@
 
   // preferência (por acessibilidade)
   const preferencia = persona.preferencia || persona.preference || '—';
-
-  // inline style para aumentar imagem (240x240) e garantir object-fit
-  const imgStyle = 'width:240px;height:240px;object-fit:cover;border-radius:12px;border:2px solid rgba(0,0,0,0.06);';
+  const preferenciaLabel = preferencia === 'alta' ? 'Alta' : preferencia === 'media' ? 'Média' : preferencia === 'baixa' ? 'Baixa' : preferencia;
 
   const html = `
     <div class="persona-card">
-      <div>
-        <img src="${foto}"
-             alt="Foto de ${nomeCompleto}"
-             loading="lazy"
-             style="${imgStyle}"
-             class="persona-avatar shadow-sm"
-             onerror="this.onerror=null;this.src='https://via.placeholder.com/240x240.png?text=${encodeURIComponent(nomeCompleto)}'">
-      </div>
-      <div>
-        <div class="persona-name">${nomeCompleto}</div>
-        ${trabalho ? `<div class="persona-role">${trabalho}${idade ? ` • ${idade}` : ''}</div>` : (idade ? `<div class="persona-role">${idade}</div>` : '')}
-        <div class="persona-meta mb-2">${briefing}</div>
+      <div style="flex: 1;">
+        <div class="persona-header">
+          <div class="persona-name">${nomeCompleto}</div>
+          ${trabalho ? `<div class="persona-role">${trabalho}${idade ? ` • ${idade} anos` : ''}</div>` : (idade ? `<div class="persona-role">${idade} anos</div>` : '')}
+        </div>
 
-        <div class="persona-section-title">Preferências</div>
-        <div class="mb-2">
-          <small class="text-muted">Acessibilidade / preferência:</small>
-          <div class="fw-semibold">${preferencia}</div>
+        <div class="persona-briefing">${briefing}</div>
+
+        <div class="persona-section">
+          <div class="persona-section-title">Preferência de Acessibilidade</div>
+          <div>
+            <div class="persona-preferencia">${preferenciaLabel} Contraste</div>
+          </div>
         </div>
 
         ${gostos.length ? `
-          <div class="persona-section-title">Gostos / Hobbies</div>
-          <div class="persona-badges mb-2">
-            ${gostos.map((g) => `<span class="badge bg-light text-dark">${String(g)}</span>`).join(' ')}
+          <div class="persona-section">
+            <div class="persona-section-title">Gostos e Hobbies</div>
+            <div class="persona-badges">
+              ${gostos.map((g) => `<span class="badge bg-light text-dark border">${String(g)}</span>`).join(' ')}
+            </div>
           </div>` : ''}
 
         ${persona.demografia || persona.location ? `
+          <div class="persona-section">
           <div class="persona-section-title">Demografia</div>
-          <div class="persona-meta">${persona.demografia || persona.location}</div>` : ''}
+            <div class="persona-meta">${persona.demografia || persona.location}</div>
+          </div>` : ''}
 
         ${persona.contact ? `
-          <div class="persona-section-title">Contato (exemplo)</div>
-          <div class="persona-meta">${persona.contact}</div>` : ''}
+          <div class="persona-section">
+            <div class="persona-section-title">Contato</div>
+            <div class="persona-meta">${persona.contact}</div>
+          </div>` : ''}
       </div>
     </div>
   `;
@@ -799,7 +799,7 @@
     const filtro = state.filtroTipo || 'Todos';
     const texto = RESUMOS_COMPONENTES[filtro] || RESUMOS_COMPONENTES['Todos'];
     resumoEl.textContent = texto;
-  }
+}
 
   // -------------------
   // Lista de componentes / seleção
