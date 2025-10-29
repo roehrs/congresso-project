@@ -768,12 +768,35 @@
 }
 
   // -------------------
+  // Resumos explicativos por tipo de componente
+  // -------------------
+  const RESUMOS_COMPONENTES = {
+    Todos: 'Componentes são blocos reutilizáveis que compõem uma página web. Cada componente tem diferentes níveis de acessibilidade (alta, média ou baixa) e pode ser personalizado com temas de contraste.',
+    Navbar: 'A Navbar (barra de navegação) é o elemento superior da página que contém links para as principais seções do site, geralmente incluindo a logo e o menu de navegação. É o primeiro elemento que os usuários veem e interagem.',
+    Section: 'Sections (seções) são áreas de conteúdo que agrupam informações relacionadas. Podem incluir Hero (seção inicial com destaque), Gallery (galeria de imagens), Contact (formulário de contato) e outras seções de conteúdo.',
+    Card: 'Cards são componentes que exibem informações de forma compacta e organizada, geralmente em formato de cartão com bordas. São ideais para destacar conteúdo, produtos ou serviços de forma visualmente atraente.',
+    Footer: 'O Footer (rodapé) é a seção inferior da página que geralmente contém informações de contato, links importantes, copyright e outras informações complementares. É o último elemento visual da página.'
+  };
+
+  function atualizarResumoComponentes() {
+    const resumoEl = document.getElementById('resumo-componentes');
+    if (!resumoEl) return;
+    
+    const filtro = state.filtroTipo || 'Todos';
+    const texto = RESUMOS_COMPONENTES[filtro] || RESUMOS_COMPONENTES['Todos'];
+    resumoEl.textContent = texto;
+  }
+
+  // -------------------
   // Lista de componentes / seleção
   // -------------------
   function renderListaComponentes() {
     const lista = document.getElementById('lista-componentes');
     if (!lista) return;
     lista.innerHTML = '';
+
+    // Atualiza o resumo explicativo
+    atualizarResumoComponentes();
 
     const itens = state.filtroTipo === 'Todos'
       ? (window.componentes || [])
