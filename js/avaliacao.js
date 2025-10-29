@@ -203,15 +203,99 @@
       }
     }
 
-    // --- 5) Combina os sub-scores usando pesos da persona (fallbacks)
+    // --- 5) Avaliação de temas aplicados aos componentes
+    const temasComponentes = lerTemasComponentes();
+    const temaGlobal = lerTemaGlobal();
+    
+    // Mapeamento: preferência da persona -> tema ideal
+    const temaIdealPorPreferencia = {
+      'alta': 'alto',
+      'media': 'medio',
+      'baixa': 'baixo'
+    };
+    
+    const temaIdeal = temaIdealPorPreferencia[persona.preferencia] || 'medio';
+    let temaScore = 50; // Score inicial neutro
+    let componentesComTema = 0;
+    let componentesComTemaIdeal = 0;
+    let componentesSemTema = 0;
+    
+    // Verifica temas aplicados por componente
+    idsComponentes.forEach((id) => {
+      const temaAplicado = temasComponentes[String(id)];
+      if (temaAplicado && temaAplicado !== 'padrao') {
+        componentesComTema++;
+        if (temaAplicado === temaIdeal) {
+          componentesComTemaIdeal++;
+        }
+      } else {
+        componentesSemTema++;
+      }
+    });
+    
+    // Calcula score baseado em quantos componentes têm o tema ideal
+    if (idsComponentes.length > 0) {
+      const totalComponentes = idsComponentes.length;
+      
+      // Bônus proporcional para componentes com tema ideal
+      const percentualIdeal = (componentesComTemaIdeal / totalComponentes) * 100;
+      
+      // Se todos os componentes têm o tema ideal
+      if (componentesComTemaIdeal === totalComponentes && componentesComTema > 0) {
+        temaScore = 100;
+        feedback.push(`✔ Todos os componentes usam o tema ideal (${temaIdeal} contraste) para ${persona.preferencia} acessibilidade.`);
+      } 
+      // Se a maioria tem o tema ideal
+      else if (percentualIdeal >= 60) {
+        temaScore = 70 + Math.round(percentualIdeal * 0.3); // 70-91
+        feedback.push(`✔ A maioria dos componentes (${Math.round(percentualIdeal)}%) usa o tema ideal.`);
+      }
+      // Se alguns têm o tema ideal
+      else if (componentesComTemaIdeal > 0) {
+        temaScore = 40 + Math.round(percentualIdeal * 0.4); // 40-64
+        feedback.push(`⚠ Apenas ${componentesComTemaIdeal}/${totalComponentes} componente(s) usa(m) o tema ideal (${temaIdeal} contraste).`);
+      }
+      // Se nenhum tem tema ou todos usam tema padrão/errado
+      else if (componentesSemTema === totalComponentes) {
+        temaScore = 30;
+        feedback.push(`⚠ Nenhum tema aplicado. Recomenda-se usar tema "${temaIdeal}" para ${persona.preferencia} acessibilidade.`);
+      } else {
+        temaScore = 20;
+        feedback.push(`✖ Os temas aplicados não correspondem ao ideal (${temaIdeal} contraste) para ${persona.preferencia} acessibilidade.`);
+      }
+      
+      // Penalidade se usar tema completamente oposto
+      const temaOposto = temaIdeal === 'alto' ? 'baixo' : (temaIdeal === 'baixo' ? 'alto' : 'medio');
+      const componentesComTemaOposto = idsComponentes.filter(id => {
+        const tema = temasComponentes[String(id)];
+        return tema === temaOposto;
+      }).length;
+      
+      if (componentesComTemaOposto > 0 && componentesComTemaIdeal === 0) {
+        temaScore = Math.max(0, temaScore - 20);
+        feedback.push(`✖ ${componentesComTemaOposto} componente(s) usa(m) tema oposto (${temaOposto} contraste), prejudicando a ${persona.preferencia} acessibilidade.`);
+      }
+    }
+
+    // --- 6) Combina os sub-scores usando pesos da persona (fallbacks)
     const w = persona.weightings || { access: 0.4, required: 0.4, preferred: 0.2 };
-    const rawScore = (accessScore * (w.access ?? 0.4))
-                   + (requiredScore * (w.required ?? 0.4))
-                   + (preferredScore * (w.preferred ?? 0.2));
+    
+    // Adiciona peso para tema (10-15% do score total)
+    const pesoTema = 0.12; // 12% do score final
+    const pesoAjustado = {
+      access: (w.access ?? 0.4) * (1 - pesoTema),
+      required: (w.required ?? 0.4) * (1 - pesoTema),
+      preferred: (w.preferred ?? 0.2) * (1 - pesoTema)
+    };
+    
+    const rawScore = (accessScore * pesoAjustado.access)
+                   + (requiredScore * pesoAjustado.required)
+                   + (preferredScore * pesoAjustado.preferred)
+                   + (temaScore * pesoTema);
 
     let score = Math.round(rawScore - forbiddenPenalty);
 
-    // --- 6) Avaliação de ordem (integração)
+    // --- 7) Avaliação de ordem (integração)
     // aplicamos penalidades de ordem diretamente ao score final
     const ordemResult = avaliarOrdem(Array.isArray(idsComponentes) ? idsComponentes : []);
     let ordemPenaltyTotal = 0;
@@ -250,6 +334,11 @@
   function lerTemasComponentes() {
     const raw = localStorage.getItem('simulador_temas_componentes');
     return raw ? JSON.parse(raw) : {};
+  }
+
+  function lerTemaGlobal() {
+    const raw = localStorage.getItem('simulador_tema_global');
+    return raw || 'padrao';
   }
 
   function renderAssembledSite(ids, targetElId = 'resultado-canvas') {
