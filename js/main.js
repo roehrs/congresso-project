@@ -683,9 +683,9 @@
       const dif = select?.value || radio?.value || 'facil';
 
       let retries = 0;
-      if (dif === 'facil') retries = 3;
-      else if (dif === 'medio') retries = 2;
-      else retries = 1;
+      if (dif === 'facil') retries = 2;
+      else if (dif === 'medio') retries = 1;
+      else retries = 0;
 
       localStorage.setItem(STORAGE_KEYS.difficulty, dif);
       localStorage.setItem(STORAGE_KEYS.retries, String(retries));
@@ -742,7 +742,7 @@
     <div class="persona-card">
       <div style="flex: 1;">
         <div class="persona-header">
-          <div class="persona-name">${nomeCompleto}</div>
+        <div class="persona-name">${nomeCompleto}</div>
           ${trabalho ? `<div class="persona-role">${trabalho}${idade ? ` • ${idade} anos` : ''}</div>` : (idade ? `<div class="persona-role">${idade} anos</div>` : '')}
         </div>
 
