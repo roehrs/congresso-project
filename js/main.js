@@ -881,6 +881,26 @@
     });
   }
 
+  function atualizarEstadoBotaoFinalizar() {
+    const btnFinalizar = document.getElementById('btn-finalizar');
+    if (!btnFinalizar) return;
+    
+    const ids = lerComponentesEscolhidos();
+    const temMinimo = ids && ids.length >= 3;
+    
+    if (temMinimo) {
+      btnFinalizar.disabled = false;
+      btnFinalizar.textContent = 'Finalizar';
+      btnFinalizar.classList.remove('btn-secondary');
+      btnFinalizar.classList.add('btn-success');
+    } else {
+      btnFinalizar.disabled = true;
+      const faltam = 3 - (ids?.length || 0);
+      btnFinalizar.classList.remove('btn-success');
+      btnFinalizar.classList.add('btn-secondary');
+    }
+  }
+
   function renderCanvasPreview() {
     const canvas = document.getElementById('canvas');
     if (!canvas) return;
@@ -890,6 +910,7 @@
       canvas.classList.add('text-muted');
       selectionState.selectedIds = [];
       updatePerComponentCustomizerUI();
+      atualizarEstadoBotaoFinalizar();
       return;
     }
     canvas.classList.remove('text-muted');
@@ -929,6 +950,9 @@
 
     canvas.innerHTML = '';
     canvas.appendChild(page);
+    
+    // Atualiza estado do botão finalizar
+    atualizarEstadoBotaoFinalizar();
   }
 
   // -------------------
@@ -1029,6 +1053,7 @@
     renderCanvasPreview();
     renderListaComponentes();
     clearSelectedComponents();
+    atualizarEstadoBotaoFinalizar();
   }
 
   // clique fora limpa seleção
@@ -1050,6 +1075,7 @@
     salvarComponentesEscolhidos(ids);
     atualizarOrdemUI();
     renderCanvasPreview();
+    atualizarEstadoBotaoFinalizar();
   };
 
   // -------------------
@@ -1070,6 +1096,19 @@
     atualizarOrdemUI();
     renderCanvasPreview();
     initThemeSelector();
+    atualizarEstadoBotaoFinalizar();
+    
+    // Configura evento do botão finalizar
+    const btnFinalizar = document.getElementById('btn-finalizar');
+    btnFinalizar?.addEventListener('click', (e) => {
+      const ids = lerComponentesEscolhidos();
+      if (!ids || ids.length < 3) {
+        e.preventDefault();
+        alert('É necessário adicionar pelo menos 3 componentes para finalizar.');
+        return false;
+      }
+      window.location.href = 'resultado.html';
+    });
 
     const btnLimpar = document.getElementById('btn-limpar');
     btnLimpar?.addEventListener('click', () => {
@@ -1098,6 +1137,7 @@
 
       clearSelectedComponents();
       renderCanvasPreview();
+      atualizarEstadoBotaoFinalizar();
     });
 
     const filtroGroup = document.querySelector('[aria-label="Filtro por tipo"]');
