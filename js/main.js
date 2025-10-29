@@ -349,6 +349,20 @@
     salvarTemasComponentes(temas);
   }
 
+  function resetarTodosTemasAoPadrao() {
+    // Restaura HTMLs originais de todos os componentes
+    (window.componentes || []).forEach(comp => {
+      if (comp._originalHtml) {
+        comp.html = comp._originalHtml;
+        delete comp._originalHtml;
+      }
+    });
+    
+    // Remove todos os temas salvos do localStorage
+    salvarTemasComponentes({});
+    salvarTemaGlobal('padrao');
+  }
+
   function aplicarTemaGlobal(temaNome) {
     if (!temaNome || !TEMAS[temaNome]) return;
     
@@ -667,6 +681,8 @@
       if (sorteada) {
         salvarPersona(sorteada);
         salvarComponentesEscolhidos([]);
+        // Reseta todos os temas ao padrão ao iniciar nova partida
+        resetarTodosTemasAoPadrao();
         window.location.href = 'persona.html';
       } else {
         alert('Nenhuma persona disponível.');

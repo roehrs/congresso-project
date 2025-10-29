@@ -141,15 +141,34 @@
           }
         }
 
+        // Função para resetar temas ao padrão
+        function resetarTodosTemasAoPadrao() {
+          // Restaura HTMLs originais de todos os componentes
+          (window.componentes || []).forEach(comp => {
+            if (comp._originalHtml) {
+              comp.html = comp._originalHtml;
+              delete comp._originalHtml;
+            }
+          });
+          
+          // Remove todos os temas salvos do localStorage
+          localStorage.setItem('simulador_temas_componentes', JSON.stringify({}));
+          localStorage.setItem('simulador_tema_global', 'padrao');
+        }
+
         document.getElementById('btn-tentar')?.addEventListener('click', () => {
           const r = getRetries();
           if (r <= 0) return;
           setRetries(r - 1);
           localStorage.setItem('simulador_componentes', JSON.stringify([]));
+          // Reseta todos os temas ao padrão antes de tentar novamente
+          resetarTodosTemasAoPadrao();
           window.location.href = 'editor.html';
         });
 
         document.getElementById('btn-encerrar')?.addEventListener('click', () => {
+          // Reseta todos os temas ao padrão antes de encerrar
+          resetarTodosTemasAoPadrao();
           window.location.href = 'index.html';
         });
 
