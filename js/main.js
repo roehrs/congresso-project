@@ -704,8 +704,8 @@
     });
   }
 
-  function initPersona() {
-  const alvo = document.getElementById('persona-conteudo');
+  function renderizarPersona(containerId) {
+    const alvo = document.getElementById(containerId);
   if (!alvo) return;
   const persona = lerPersona();
   if (!persona) {
@@ -718,16 +718,8 @@
     || persona.nome
     || '—';
 
-  // foto/ avatar (aceita persona.photo, persona.foto, persona.avatar)
-  let foto = persona.photo || persona.foto || persona.avatar || '';
-  const isValidUrl = (u) => typeof u === 'string' && (u.startsWith('http://') || u.startsWith('https://') || u.startsWith('/'));
-  if (!isValidUrl(foto)) {
-    const label = encodeURIComponent(nomeCompleto);
-    foto = `https://via.placeholder.com/240x240.png?text=${label}`;
-  }
-
   // idade e trabalho (fallbacks)
-  const idade = (persona.idade || persona.age) ? String(persona.idade || persona.age) : null;
+    const idade = (persona.idade || persona.age) ? String(persona.idade || persona.age) : null;
   const trabalho = persona.profissao || persona.trabalho || persona.role || persona.ocupacao || null;
 
   // gostos/hobbies (array) e briefing
@@ -736,50 +728,55 @@
 
   // preferência (por acessibilidade)
   const preferencia = persona.preferencia || persona.preference || '—';
-  const preferenciaLabel = preferencia === 'alta' ? 'Alta' : preferencia === 'media' ? 'Média' : preferencia === 'baixa' ? 'Baixa' : preferencia;
+    const preferenciaLabel = preferencia === 'alta' ? 'Alta' : preferencia === 'media' ? 'Média' : preferencia === 'baixa' ? 'Baixa' : preferencia;
 
   const html = `
     <div class="persona-card">
-      <div style="flex: 1;">
-        <div class="persona-header">
+        <div style="flex: 1;">
+          <div class="persona-header">
         <div class="persona-name">${nomeCompleto}</div>
-          ${trabalho ? `<div class="persona-role">${trabalho}${idade ? ` • ${idade} anos` : ''}</div>` : (idade ? `<div class="persona-role">${idade} anos</div>` : '')}
-        </div>
-
-        <div class="persona-briefing">${briefing}</div>
-
-        <div class="persona-section">
-          <div class="persona-section-title">Preferência de Acessibilidade</div>
-          <div>
-            <div class="persona-preferencia">${preferenciaLabel} Contraste</div>
+            ${trabalho ? `<div class="persona-role">${trabalho}${idade ? ` • ${idade} anos` : ''}</div>` : (idade ? `<div class="persona-role">${idade} anos</div>` : '')}
           </div>
+
+          <div class="persona-briefing">${briefing}</div>
+
+          <div class="persona-section">
+            <div class="persona-section-title">Preferência de Acessibilidade</div>
+            <div>
+              <div class="persona-preferencia">${preferenciaLabel} Contraste</div>
+            </div>
         </div>
 
         ${gostos.length ? `
-          <div class="persona-section">
-            <div class="persona-section-title">Gostos e Hobbies</div>
-            <div class="persona-badges">
-              ${gostos.map((g) => `<span class="badge bg-light text-dark border">${String(g)}</span>`).join(' ')}
-            </div>
+            <div class="persona-section">
+              <div class="persona-section-title">Gostos e Hobbies</div>
+              <div class="persona-badges">
+                ${gostos.map((g) => `<span class="badge bg-light text-dark border">${String(g)}</span>`).join(' ')}
+              </div>
           </div>` : ''}
 
         ${persona.demografia || persona.location ? `
-          <div class="persona-section">
+            <div class="persona-section">
           <div class="persona-section-title">Demografia</div>
-            <div class="persona-meta">${persona.demografia || persona.location}</div>
-          </div>` : ''}
+              <div class="persona-meta">${persona.demografia || persona.location}</div>
+            </div>` : ''}
 
         ${persona.contact ? `
-          <div class="persona-section">
-            <div class="persona-section-title">Contato</div>
-            <div class="persona-meta">${persona.contact}</div>
-          </div>` : ''}
+            <div class="persona-section">
+              <div class="persona-section-title">Contato</div>
+              <div class="persona-meta">${persona.contact}</div>
+            </div>` : ''}
       </div>
     </div>
   `;
 
   alvo.innerHTML = html;
-}
+  }
+
+  function initPersona() {
+    renderizarPersona('persona-conteudo');
+  }
+
 
   // -------------------
   // Resumos explicativos por tipo de componente
@@ -1119,6 +1116,21 @@
   // Editor init
   // -------------------
   function initEditor() {
+    // Renderiza persona no modal quando necessário
+    const modalPersona = document.getElementById('modal-persona');
+    if (modalPersona) {
+      modalPersona.addEventListener('show.bs.modal', () => {
+        renderizarPersona('modal-persona-conteudo');
+      });
+    }
+
+    const persona = lerPersona();
+    if (!persona) {
+      alert('Nenhuma persona encontrada. Volte e comece novamente.');
+      window.location.href = 'index.html';
+      return;
+    }
+
     const canvas = document.getElementById('canvas');
     if (!canvas) return;
 
