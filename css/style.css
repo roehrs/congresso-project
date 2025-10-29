@@ -20,12 +20,15 @@ body {
 /* Canvas drop area */
 .canvas-drop {
   min-height: 240px;
+  max-height: calc(100vh - 300px);
   background: var(--component-bg);
   display: flex;
   align-items: flex-start;
   justify-content: center;
   padding: var(--canvas-padding);
   flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* preview box in the component list */
