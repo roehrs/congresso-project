@@ -62,47 +62,50 @@
           </div>
         </div>
 
-        <!-- Painel direito: customização de cores (global + per-component) -->
+        <!-- Painel direito: escolha de tema -->
         <div class="col-12 col-lg-3">
           <div class="card shadow-sm h-100">
             <div class="card-body">
-              <h5 class="h6 mb-3">Personalizar cores</h5>
+              <h5 class="h6 mb-3">Escolha de Tema</h5>
 
-              <!-- Global customizer -->
-              <div id="global-customizer">
+              <!-- Seleção quando nenhum componente está selecionado -->
+              <div id="global-theme-selector">
                 <div class="mb-3">
-                  <label class="form-label small">Cor principal (accent)</label>
-                  <input type="color" id="color-accent" class="form-control form-control-color" value="#0d6efd">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label small">Fundo do componente</label>
-                  <input type="color" id="color-bg" class="form-control form-control-color" value="#ffffff">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label small">Cor do texto</label>
-                  <input type="color" id="color-text" class="form-control form-control-color" value="#212529">
+                  <label class="form-label small mb-2">Tema global (aplica a todos os componentes)</label>
+                  <select id="select-tema-global" class="form-select form-select-sm">
+                    <option value="padrao">Tema Padrão (cores originais)</option>
+                    <option value="medio">Médio contraste</option>
+                    <option value="alto">Alto contraste</option>
+                    <option value="baixo">Baixo contraste</option>
+                  </select>
                 </div>
                 <div class="d-flex gap-2">
-                  <button id="btn-aplicar-cores" class="btn btn-primary btn-sm">Aplicar</button>
-                  <button id="btn-reset-cores" class="btn btn-outline-secondary btn-sm">Resetar</button>
+                  <button id="btn-aplicar-tema-global" class="btn btn-primary btn-sm">Aplicar tema global</button>
+                  <button id="btn-reset-tema" class="btn btn-outline-secondary btn-sm">Resetar</button>
                 </div>
               </div>
 
-              <!-- Per-component customizer (inicialmente escondido) -->
-              <div id="per-comp-customizer" class="mt-3 d-none">
-                <div class="mb-2 small text-muted">Customizando componente(s) selecionado(s)</div>
-                <div id="comp-color-inputs-container" style="max-height: calc(100vh - 300px); overflow-y: auto;">
-                  <!-- Inputs dinâmicos serão criados aqui -->
+              <!-- Seleção quando componente(s) está(ão) selecionado(s) -->
+              <div id="per-comp-theme-selector" class="mt-3 d-none">
+                <div class="mb-2 small text-muted">Aplicar tema ao(s) componente(s) selecionado(s)</div>
+                <div class="mb-3">
+                  <label class="form-label small mb-2">Escolha o tema:</label>
+                  <select id="select-tema-componente" class="form-select form-select-sm">
+                    <option value="padrao">Tema Padrão (cores originais)</option>
+                    <option value="medio">Médio contraste</option>
+                    <option value="alto">Alto contraste</option>
+                    <option value="baixo">Baixo contraste</option>
+                  </select>
                 </div>
-                <div class="d-flex gap-2 mt-3">
-                  <button id="btn-comp-aplicar" class="btn btn-primary btn-sm">Aplicar ao(s) selecionado(s)</button>
-                  <button id="btn-comp-resetar" class="btn btn-outline-secondary btn-sm">Resetar seleção</button>
+                <div class="d-flex gap-2">
+                  <button id="btn-aplicar-tema-componente" class="btn btn-primary btn-sm">Aplicar tema</button>
+                  <button id="btn-reset-tema-componente" class="btn btn-outline-secondary btn-sm">Remover tema</button>
                   <button id="btn-comp-excluir" class="btn btn-outline-danger btn-sm">Excluir</button>
                 </div>
               </div>
 
               <hr class="my-3">
-              <div class="small text-muted">As cores podem ser aplicadas globalmente ou por componente. Clique em um bloco no canvas para selecioná-lo.</div>
+              <div class="small text-muted">Escolha um tema de contraste para aplicar. Os temas alteram as cores de todos os elementos do componente.</div>
             </div>
           </div>
         </div>

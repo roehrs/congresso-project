@@ -6,6 +6,8 @@
     componentesEscolhidos: 'simulador_componentes',
     colorSettings: 'simulador_colors',
     customColors: 'simulador_custom_colors',
+    temasComponentes: 'simulador_temas_componentes',
+    temaGlobal: 'simulador_tema_global',
     retries: 'simulador_retries',
     difficulty: 'simulador_difficulty'
   };
@@ -14,6 +16,163 @@
     accent: '#0d6efd',
     background: '#ffffff',
     text: '#212529'
+  };
+
+  // -------------------
+  // Temas de contraste inteligentes por tipo de componente
+  // -------------------
+  const TEMAS = {
+    padrao: {
+      nome: 'Tema Padrão',
+      descricao: 'Cores originais do componente',
+      porTipo: {
+        // Tema padrão não aplica nenhuma cor, apenas restaura o HTML original
+        default: {}
+      }
+    },
+    alto: {
+      nome: 'Alto Contraste',
+      descricao: 'Cores com máximo contraste para alta acessibilidade',
+      // Regras específicas por tipo de componente
+      porTipo: {
+        Navbar: {
+          'background-color': '#000000',
+          'background': '#000000',
+          'color': '#ffffff',
+          'border-color': '#ffffff'
+        },
+        Footer: {
+          'background-color': '#000000',
+          'background': '#000000',
+          'color': '#ffffff',
+          'border-color': '#ffffff',
+          'border-top-color': '#ffffff'
+        },
+        Section: {
+          'background-color': '#ffffff',
+          'background': '#ffffff',
+          'color': '#000000',
+          'border-color': '#000000'
+        },
+        Hero: {
+          'background-color': '#ffffff',
+          'background': '#ffffff',
+          'color': '#000000',
+          'border-color': '#000000'
+        },
+        Card: {
+          'background-color': '#ffffff',
+          'background': '#ffffff',
+          'color': '#000000',
+          'border-color': '#000000',
+          'border-top-color': '#000000',
+          'border-bottom-color': '#000000',
+          'border-left-color': '#000000',
+          'border-right-color': '#000000'
+        },
+        // Padrão para outros componentes
+        default: {
+          'background-color': '#ffffff',
+          'background': '#ffffff',
+          'color': '#000000',
+          'border-color': '#000000'
+        }
+      }
+    },
+    medio: {
+      nome: 'Médio Contraste',
+      descricao: 'Cores balanceadas com bom contraste',
+      porTipo: {
+        Navbar: {
+          'background-color': '#212529',
+          'background': '#212529',
+          'color': '#ffffff',
+          'border-color': '#495057'
+        },
+        Footer: {
+          'background-color': '#212529',
+          'background': '#212529',
+          'color': '#ffffff',
+          'border-color': '#495057',
+          'border-top-color': '#495057'
+        },
+        Section: {
+          'background-color': '#f8f9fa',
+          'background': '#f8f9fa',
+          'color': '#212529',
+          'border-color': '#dee2e6'
+        },
+        Hero: {
+          'background-color': '#f8f9fa',
+          'background': '#f8f9fa',
+          'color': '#212529',
+          'border-color': '#dee2e6'
+        },
+        Card: {
+          'background-color': '#ffffff',
+          'background': '#ffffff',
+          'color': '#212529',
+          'border-color': '#dee2e6',
+          'border-top-color': '#dee2e6',
+          'border-bottom-color': '#dee2e6',
+          'border-left-color': '#dee2e6',
+          'border-right-color': '#dee2e6'
+        },
+        default: {
+          'background-color': '#f8f9fa',
+          'background': '#f8f9fa',
+          'color': '#212529',
+          'border-color': '#dee2e6'
+        }
+      }
+    },
+    baixo: {
+      nome: 'Baixo Contraste',
+      descricao: 'Cores suaves com pouco contraste (visual moderno)',
+      porTipo: {
+        Navbar: {
+          'background-color': '#ffffff',
+          'background': '#ffffff',
+          'color': '#6c757d',
+          'border-color': '#e9ecef'
+        },
+        Footer: {
+          'background-color': '#ffffff',
+          'background': '#ffffff',
+          'color': '#6c757d',
+          'border-color': '#e9ecef',
+          'border-top-color': '#e9ecef'
+        },
+        Section: {
+          'background-color': '#ffffff',
+          'background': '#ffffff',
+          'color': '#6c757d',
+          'border-color': '#f1f3f5'
+        },
+        Hero: {
+          'background-color': '#ffffff',
+          'background': '#ffffff',
+          'color': '#6c757d',
+          'border-color': '#f1f3f5'
+        },
+        Card: {
+          'background-color': '#ffffff',
+          'background': '#ffffff',
+          'color': '#6c757d',
+          'border-color': '#e9ecef',
+          'border-top-color': '#e9ecef',
+          'border-bottom-color': '#e9ecef',
+          'border-left-color': '#e9ecef',
+          'border-right-color': '#e9ecef'
+        },
+        default: {
+          'background-color': '#ffffff',
+          'background': '#ffffff',
+          'color': '#6c757d',
+          'border-color': '#e9ecef'
+        }
+      }
+    }
   };
 
   const state = {
@@ -25,62 +184,247 @@
   };
 
   // -------------------
-  // Color customizer (global)
+  // Sistema de Temas
   // -------------------
-  function salvarColorSettings(colors) {
-    localStorage.setItem(STORAGE_KEYS.colorSettings, JSON.stringify(colors));
+  function salvarTemaGlobal(tema) {
+    localStorage.setItem(STORAGE_KEYS.temaGlobal, tema || 'padrao');
   }
 
-  function lerColorSettings() {
-    const raw = localStorage.getItem(STORAGE_KEYS.colorSettings);
-    return raw ? JSON.parse(raw) : { ...DEFAULT_COLORS };
+  function lerTemaGlobal() {
+    const raw = localStorage.getItem(STORAGE_KEYS.temaGlobal);
+    return raw || 'padrao';
   }
 
-  function applyColorSettings(colors) {
-    const canvas = document.getElementById('canvas');
-    if (canvas) {
-      canvas.style.setProperty('--accent-color', colors.accent);
-      canvas.style.setProperty('--component-bg', colors.background);
-      canvas.style.setProperty('--component-text', colors.text);
+  function salvarTemasComponentes(map) {
+    localStorage.setItem(STORAGE_KEYS.temasComponentes, JSON.stringify(map || {}));
+  }
+
+  function lerTemasComponentes() {
+    const raw = localStorage.getItem(STORAGE_KEYS.temasComponentes);
+    return raw ? JSON.parse(raw) : {};
+  }
+
+  function getTemaComponente(id) {
+    const temas = lerTemasComponentes();
+    return temas[String(id)] || null;
+  }
+
+  function aplicarTemaAComponente(componentId, temaNome) {
+    if (!temaNome || !TEMAS[temaNome]) return;
+    
+    const comp = (window.componentes || []).find(c => c.id === componentId);
+    if (!comp || !comp.html) return;
+
+    // Salva HTML original se necessário
+    if (!comp._originalHtml) {
+      comp._originalHtml = comp.html;
     }
-    document.querySelectorAll('.componente-preview .preview-inner, .prototype-page, .prototype-block').forEach((el) => {
-      el.style.setProperty('--accent-color', colors.accent);
-      el.style.setProperty('--component-bg', colors.background);
-      el.style.setProperty('--component-text', colors.text);
+
+    // Se for tema padrão, apenas restaura o HTML original
+    if (temaNome === 'padrao') {
+      if (comp._originalHtml) {
+        comp.html = comp._originalHtml;
+        // Remove o tema dos salvos para que não seja reaplicado
+        const temas = lerTemasComponentes();
+        delete temas[String(componentId)];
+        salvarTemasComponentes(temas);
+        return;
+      }
+      return;
+    }
+
+    const tema = TEMAS[temaNome];
+    
+    // Identifica o tipo de componente
+    // Hero, Gallery, Contact são tratados como Section
+    let tipoComponente = comp.tipo || comp.categoria || 'default';
+    if (tipoComponente === 'Hero' || tipoComponente === 'Gallery' || tipoComponente === 'Contact') {
+      tipoComponente = 'Section';
+    }
+    
+    const coresPorTipo = tema.porTipo[tipoComponente] || tema.porTipo.default || {};
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = comp._originalHtml;
+
+    // Aplica cores do tema de forma contextual por tipo de componente
+    const allElements = tempDiv.querySelectorAll('[style]');
+    allElements.forEach((el) => {
+      if (!el.hasAttribute('style')) return;
+      
+      let elementStyle = el.getAttribute('style');
+      const tagName = el.tagName.toLowerCase();
+      
+      // Determina quais propriedades aplicar baseado no elemento e tipo de componente
+      const propertiesToApply = [];
+      
+      // Para Navbars e Footers, aplica cores mais agressivamente
+      const isNavOrFooter = tipoComponente === 'Navbar' || tipoComponente === 'Footer' || 
+                           tagName === 'nav' || tagName === 'footer';
+      
+      // Verifica background-color (prioridade sobre background simples)
+      const hasBgColor = /(?:^|;)\s*background-color\s*:/i.test(elementStyle);
+      if (hasBgColor) {
+        propertiesToApply.push('background-color');
+      } else {
+        // Só aplica background se for um valor de cor simples
+        const bgMatch = elementStyle.match(/(?:^|;)\s*background\s*:\s*([^;]+)/i);
+        if (bgMatch) {
+          const bgValue = bgMatch[1].trim();
+          // Para nav/footer, pode aplicar mesmo com rgba (remove transparência)
+          if (!bgValue.includes('url(') && !bgValue.includes('image')) {
+            if (isNavOrFooter || (!bgValue.includes('gradient') && !bgValue.includes('rgba'))) {
+              propertiesToApply.push('background');
+            }
+          }
+        }
+      }
+      
+      // Sempre aplica color se existir (principalmente para texto e links)
+      const hasColor = /(?:^|;)\s*color\s*:/i.test(elementStyle);
+      if (hasColor) {
+        propertiesToApply.push('color');
+      }
+      
+      // Aplica border-color se existir (importante para cards e seções)
+      const hasBorderColor = /(?:^|;)\s*border(?:-[a-z-]+)?-color\s*:/i.test(elementStyle);
+      if (hasBorderColor) {
+        // Detecta qual tipo de border-color
+        if (/border-top-color/i.test(elementStyle)) propertiesToApply.push('border-top-color');
+        else if (/border-bottom-color/i.test(elementStyle)) propertiesToApply.push('border-bottom-color');
+        else if (/border-left-color/i.test(elementStyle)) propertiesToApply.push('border-left-color');
+        else if (/border-right-color/i.test(elementStyle)) propertiesToApply.push('border-right-color');
+        else propertiesToApply.push('border-color');
+      }
+      
+      // Aplica as propriedades do tema
+      propertiesToApply.forEach(property => {
+        if (coresPorTipo[property]) {
+          const newColor = coresPorTipo[property];
+          const escapedProp = property.replace(/-/g, '\\-');
+          const regex = new RegExp(`(?:^|;)\\s*${escapedProp}\\s*:\\s*[^;]+`, 'gi');
+          
+          const hasProperty = regex.test(elementStyle);
+          regex.lastIndex = 0;
+          
+          if (hasProperty) {
+            // Substitui o valor existente
+            elementStyle = elementStyle.replace(regex, (match) => {
+              // Mantém rgba se for nav/footer com background transparente original
+              if (isNavOrFooter && property === 'background' && match.includes('rgba')) {
+                // Remove transparência mantendo a cor
+                return match.replace(/rgba?\([^)]+\)/, newColor);
+              }
+              return match.replace(/:\s*[^;]+/, ': ' + newColor);
+            });
+          } else if (property === 'background-color' || property === 'color') {
+            // Adiciona propriedades essenciais se não existirem (para nav/footer especialmente)
+            if (isNavOrFooter || tagName === 'nav' || tagName === 'footer' || tagName === 'a') {
+              elementStyle = (elementStyle.trim().endsWith(';') ? elementStyle : elementStyle + ';') + ` ${property}: ${newColor};`;
+            }
+          }
+        }
+      });
+      
+      el.setAttribute('style', elementStyle.trim());
     });
+
+    // Atualiza o componente
+    comp.html = tempDiv.innerHTML;
+    
+    // Salva o tema aplicado
+    const temas = lerTemasComponentes();
+    temas[String(componentId)] = temaNome;
+    salvarTemasComponentes(temas);
   }
 
-  function initCustomizer() {
-    const inpAccent = document.getElementById('color-accent');
-    const inpBg = document.getElementById('color-bg');
-    const inpText = document.getElementById('color-text');
-    const btnAplicar = document.getElementById('btn-aplicar-cores');
-    const btnReset = document.getElementById('btn-reset-cores');
+  function removerTemaComponente(componentId) {
+    const comp = (window.componentes || []).find(c => c.id === componentId);
+    if (comp && comp._originalHtml) {
+      comp.html = comp._originalHtml;
+    }
+    
+    const temas = lerTemasComponentes();
+    delete temas[String(componentId)];
+    salvarTemasComponentes(temas);
+  }
 
-    if (!inpAccent || !inpBg || !inpText) return;
+  function aplicarTemaGlobal(temaNome) {
+    if (!temaNome || !TEMAS[temaNome]) return;
+    
+    const ids = lerComponentesEscolhidos();
+    ids.forEach(id => {
+      aplicarTemaAComponente(id, temaNome);
+    });
+    
+    salvarTemaGlobal(temaNome);
+  }
 
-    const saved = lerColorSettings();
-    inpAccent.value = saved.accent || DEFAULT_COLORS.accent;
-    inpBg.value = saved.background || DEFAULT_COLORS.background;
-    inpText.value = saved.text || DEFAULT_COLORS.text;
-    applyColorSettings(saved);
+  function initThemeSelector() {
+    const selectGlobal = document.getElementById('select-tema-global');
+    const selectComponente = document.getElementById('select-tema-componente');
+    const btnAplicarGlobal = document.getElementById('btn-aplicar-tema-global');
+    const btnResetGlobal = document.getElementById('btn-reset-tema');
+    const btnAplicarComponente = document.getElementById('btn-aplicar-tema-componente');
+    const btnResetComponente = document.getElementById('btn-reset-tema-componente');
 
-    btnAplicar?.addEventListener('click', () => {
-      const colors = { accent: inpAccent.value, background: inpBg.value, text: inpText.value };
-      salvarColorSettings(colors);
-      applyColorSettings(colors);
-      renderListaComponentes();
+    // Carrega tema global salvo
+    const temaGlobalSalvo = lerTemaGlobal();
+    if (selectGlobal) {
+      selectGlobal.value = temaGlobalSalvo || 'padrao';
+    }
+
+    btnAplicarGlobal?.addEventListener('click', () => {
+      const tema = selectGlobal?.value || 'padrao';
+      if (tema === 'padrao') {
+        // Remove todos os temas aplicados
+        const ids = lerComponentesEscolhidos();
+        ids.forEach(id => {
+          removerTemaComponente(id);
+        });
+        salvarTemaGlobal('padrao');
+      } else {
+        aplicarTemaGlobal(tema);
+      }
       renderCanvasPreview();
+      renderListaComponentes();
+      updateWrapperSelectionUI();
     });
 
-    btnReset?.addEventListener('click', () => {
-      salvarColorSettings(DEFAULT_COLORS);
-      inpAccent.value = DEFAULT_COLORS.accent;
-      inpBg.value = DEFAULT_COLORS.background;
-      inpText.value = DEFAULT_COLORS.text;
-      applyColorSettings(DEFAULT_COLORS);
-      renderListaComponentes();
+    btnResetGlobal?.addEventListener('click', () => {
+      const ids = lerComponentesEscolhidos();
+      ids.forEach(id => {
+        removerTemaComponente(id);
+      });
+      salvarTemaGlobal('padrao');
+      if (selectGlobal) selectGlobal.value = 'padrao';
       renderCanvasPreview();
+      renderListaComponentes();
+    });
+
+    btnAplicarComponente?.addEventListener('click', () => {
+      const tema = selectComponente?.value || 'padrao';
+      if (!selectionState.selectedIds.length) return;
+      
+      selectionState.selectedIds.forEach(id => {
+        aplicarTemaAComponente(id, tema);
+      });
+      
+      renderCanvasPreview();
+      renderListaComponentes();
+      updateWrapperSelectionUI();
+    });
+
+    btnResetComponente?.addEventListener('click', () => {
+      if (!selectionState.selectedIds.length) return;
+      
+      selectionState.selectedIds.forEach(id => {
+        removerTemaComponente(id);
+      });
+      
+      renderCanvasPreview();
+      renderListaComponentes();
+      updateWrapperSelectionUI();
     });
   }
 
@@ -457,10 +801,10 @@
 
       const previewInner = item.querySelector('.preview-inner');
       if (previewInner) {
-        const compColors = getColorsForComponent(comp.id);
-        previewInner.style.setProperty('--accent-color', compColors.accent);
-        previewInner.style.setProperty('--component-bg', compColors.background);
-        previewInner.style.setProperty('--component-text', compColors.text);
+        // Usa cores padrão para preview (temas são aplicados diretamente no HTML)
+        previewInner.style.setProperty('--accent-color', DEFAULT_COLORS.accent);
+        previewInner.style.setProperty('--component-bg', DEFAULT_COLORS.background);
+        previewInner.style.setProperty('--component-text', DEFAULT_COLORS.text);
       }
 
       const btn = item.querySelector('.select-btn');
@@ -536,12 +880,10 @@
 
     const page = document.createElement('div');
     page.className = 'prototype-page';
-    const colors = lerColorSettings();
-    page.style.setProperty('--accent-color', colors.accent);
-    page.style.setProperty('--component-bg', colors.background);
-    page.style.setProperty('--component-text', colors.text);
-
-    const customMap = lerCustomColors();
+    // Cores padrão (não usamos mais colorSettings, mas mantemos para compatibilidade visual)
+    page.style.setProperty('--accent-color', DEFAULT_COLORS.accent);
+    page.style.setProperty('--component-bg', DEFAULT_COLORS.background);
+    page.style.setProperty('--component-text', DEFAULT_COLORS.text);
 
     ids.forEach((id) => {
       const comp = (window.componentes || []).find((c) => c.id === id);
@@ -549,112 +891,13 @@
       wrapper.className = 'prototype-block';
       wrapper.setAttribute('data-comp-id', String(id));
       
-      // Usa HTML modificado se existir, senão usa o original
+      // Usa HTML do componente (pode estar com tema aplicado)
       let htmlToUse = comp?.html || `<div style="padding:8px;background:#f8f9fa;border-radius:6px">Componente #${id}</div>`;
       
-      // Aplica cores personalizadas se existirem
-      const customColors = customMap[String(id)];
-      if (customColors && comp && Object.keys(customColors).length > 0) {
-        // Salva original se necessário
-        if (!comp._originalHtml) {
-          comp._originalHtml = comp.html;
-        }
-        
-        let modifiedHtml = comp._originalHtml;
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = comp._originalHtml;
-        
-        // Para cada elemento/grupo com cores personalizadas
-        Object.keys(customColors).forEach(elementKey => {
-          const colorValue = customColors[elementKey];
-          
-          // Verifica se é um grupo (tag_property = valor direto)
-          const groupMatch = elementKey.match(/^(\w+)_(.+)$/);
-          if (groupMatch && typeof colorValue === 'string') {
-            // É um grupo: aplica a cor em todos os elementos dessa tag com essa propriedade
-            const tagName = groupMatch[1];
-            const property = groupMatch[2];
-            const newHex = colorValue;
-            
-            // Busca todos os elementos desta tag no HTML
-            const tagElements = tempDiv.querySelectorAll(tagName);
-            tagElements.forEach((el) => {
-              if (el.hasAttribute('style')) {
-                let elementStyle = el.getAttribute('style');
-                const escapedProp = property.replace(/-/g, '\\-');
-                const regex = new RegExp(`(?:^|;)\\s*${escapedProp}\\s*:\\s*[^;]+`, 'gi');
-                
-                const hasProperty = regex.test(elementStyle);
-                regex.lastIndex = 0;
-                
-                if (hasProperty) {
-                  elementStyle = elementStyle.replace(regex, (match) => {
-                    return match.replace(/:\s*[^;]+/, ': ' + newHex);
-                  });
-                } else {
-                  elementStyle = (elementStyle.trim().endsWith(';') ? elementStyle : elementStyle + ';') + ` ${property}: ${newHex};`;
-                }
-                el.setAttribute('style', elementStyle.trim());
-              }
-            });
-            
-            // Também substitui diretamente no HTML string para garantir
-            const escapedProp = property.replace(/-/g, '\\-');
-            const regex = new RegExp(`(<${tagName}[^>]*\\sstyle\\s*=\\s*["'])([^"']*${escapedProp}\\s*:\\s*)([^;"]+)([^"']*)(["'])`, 'gi');
-            modifiedHtml = modifiedHtml.replace(regex, (match, start, propPart, oldVal, rest, end) => {
-              return start + propPart + newHex + rest + end;
-            });
-          } else {
-            // É um elemento individual (estrutura antiga para compatibilidade)
-            const elementColors = typeof colorValue === 'object' ? colorValue : {};
-            const elementSelector = elementKey;
-            
-            // Encontra o elemento no DOM temporário
-            let targetElement = null;
-            try {
-              targetElement = tempDiv.querySelector(elementSelector);
-            } catch (e) {
-              const parts = elementSelector.split('_');
-              if (parts.length >= 2) {
-                const allOfTag = tempDiv.querySelectorAll(parts[0]);
-                const index = parseInt(parts[1]);
-                if (allOfTag[index]) {
-                  targetElement = allOfTag[index];
-                }
-              }
-            }
-            
-            if (targetElement && targetElement.hasAttribute('style')) {
-              let elementStyle = targetElement.getAttribute('style');
-              
-              Object.keys(elementColors).forEach(property => {
-                const newHex = elementColors[property];
-                const escapedProp = property.replace(/-/g, '\\-');
-                const regex = new RegExp(`(?:^|;)\\s*${escapedProp}\\s*:\\s*[^;]+`, 'gi');
-                
-                const hasProperty = regex.test(elementStyle);
-                regex.lastIndex = 0;
-                
-                if (hasProperty) {
-                  elementStyle = elementStyle.replace(regex, (match) => {
-                    return match.replace(/:\s*[^;]+/, ': ' + newHex);
-                  });
-                } else {
-                  elementStyle = (elementStyle.trim().endsWith(';') ? elementStyle : elementStyle + ';') + ` ${property}: ${newHex};`;
-                }
-              });
-              
-              targetElement.setAttribute('style', elementStyle.trim());
-            }
-          }
-        });
-        
-        if (tempDiv.innerHTML !== comp._originalHtml) {
-          htmlToUse = tempDiv.innerHTML;
-        } else {
-          htmlToUse = modifiedHtml;
-        }
-      }
+      // Verifica se há tema aplicado (o tema já foi aplicado no HTML do componente)
+      const temas = lerTemasComponentes();
+      const temaAplicado = temas[String(id)];
+      // Não precisa fazer nada aqui, pois o tema já foi aplicado diretamente no comp.html
       
       wrapper.innerHTML = htmlToUse;
 
@@ -698,168 +941,55 @@
   }
 
   function updatePerComponentCustomizerUI() {
-    const container = document.getElementById('per-comp-customizer');
-    const noneContainer = document.getElementById('global-customizer');
-    const inputsContainer = document.getElementById('comp-color-inputs-container');
-    if (!container || !noneContainer || !inputsContainer) return;
+    const perCompContainer = document.getElementById('per-comp-theme-selector');
+    const globalContainer = document.getElementById('global-theme-selector');
+    const selectComponente = document.getElementById('select-tema-componente');
+    
+    if (!perCompContainer || !globalContainer) return;
     
     if (selectionState.selectedIds.length === 0) {
-      container.classList.add('d-none');
-      noneContainer.classList.remove('d-none');
-      inputsContainer.innerHTML = '';
+      perCompContainer.classList.add('d-none');
+      globalContainer.classList.remove('d-none');
       return;
     }
     
-    container.classList.remove('d-none');
-    noneContainer.classList.add('d-none');
+    perCompContainer.classList.remove('d-none');
+    globalContainer.classList.add('d-none');
     
-    // Limpa container
-    inputsContainer.innerHTML = '';
+    // Verifica se todos os componentes selecionados têm o mesmo tema
+    const temasComponentes = lerTemasComponentes();
+    const temasSelecionados = selectionState.selectedIds.map(id => temasComponentes[String(id)]).filter(Boolean);
     
-    // Cria um formulário para cada componente selecionado
-    selectionState.selectedIds.forEach((componentId) => {
-      const comp = (window.componentes || []).find(c => c.id === componentId);
-      if (!comp) return;
-      
-      const extractedElements = extractColorsFromComponent(componentId);
-      const savedColors = getColorsForComponent(componentId);
-      
-      // Cria card/formulário para este componente
-      const componentForm = document.createElement('div');
-      componentForm.className = 'mb-4 p-3 border rounded';
-      componentForm.setAttribute('data-component-id', componentId);
-      
-      // Cabeçalho com nome do componente
-      const header = document.createElement('div');
-      header.className = 'mb-3 pb-2 border-bottom';
-      header.innerHTML = `
-        <h6 class="mb-0 small fw-semibold">Componente #${componentId} - ${comp.tipo || 'Componente'}</h6>
-        <small class="text-muted">${comp.descricao || ''}</small>
-      `;
-      componentForm.appendChild(header);
-      
-      if (extractedElements.length === 0) {
-        const noColorsMsg = document.createElement('div');
-        noColorsMsg.className = 'small text-muted';
-        noColorsMsg.textContent = 'Nenhum elemento com cor detectado neste componente.';
-        componentForm.appendChild(noColorsMsg);
-      } else {
-        // Agrupa elementos por tag para melhor organização
-        const elementsByTag = {};
-        extractedElements.forEach((elementInfo) => {
-          if (!elementsByTag[elementInfo.tag]) {
-            elementsByTag[elementInfo.tag] = [];
-          }
-          elementsByTag[elementInfo.tag].push(elementInfo);
-        });
-        
-        // Cria seção para cada tag
-        Object.keys(elementsByTag).forEach(tagName => {
-          const tagElements = elementsByTag[tagName];
-          const tagSection = document.createElement('div');
-          tagSection.className = 'mb-3';
-          
-          // Label da tag
-          const tagLabel = document.createElement('div');
-          tagLabel.className = 'small fw-semibold mb-2 text-secondary';
-          const totalCount = tagElements.reduce((sum, el) => sum + (el.count || 1), 0);
-          tagLabel.innerHTML = `&lt;${tagName}&gt; ${totalCount > 1 ? `<span class="text-muted">(${totalCount} elementos)</span>` : ''}`;
-          tagSection.appendChild(tagLabel);
-          
-          // Cria input para cada propriedade de cor desta tag
-          tagElements.forEach((elementInfo) => {
-            const propertyLabel = elementInfo.property
-              .split('-')
-              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(' ');
-            
-            // Busca cor salva: estrutura salvaColors[tag_property] = hex (para grupos)
-            const elementKey = elementInfo.selector || `${elementInfo.tag}_${elementInfo.property}`;
-            const savedHex = (savedColors && savedColors[elementKey] && (typeof savedColors[elementKey] === 'string' ? savedColors[elementKey] : savedColors[elementKey][elementInfo.property])) || elementInfo.hex || '#000000';
-            
-            const colorWrapper = document.createElement('div');
-            colorWrapper.className = 'mb-2 ms-3';
-            colorWrapper.innerHTML = `
-              <label class="form-label small" style="display: block; margin-bottom: 0.25rem;">${propertyLabel} ${elementInfo.count > 1 ? `<small class="text-muted">(${elementInfo.count}x)</small>` : ''}</label>
-              <input type="color" 
-                     data-component-id="${componentId}"
-                     data-element-tag="${elementInfo.tag}"
-                     data-element-selector="${elementKey}"
-                     data-property="${elementInfo.property}" 
-                     data-original-hex="${elementInfo.hex || '#000000'}"
-                     data-is-group="${elementInfo.isGroup || false}"
-                     class="form-control form-control-color comp-color-input" 
-                     value="${savedHex}"
-                     style="width: 100%; height: 38px;">
-            `;
-            tagSection.appendChild(colorWrapper);
-          });
-          
-          componentForm.appendChild(tagSection);
-        });
+    // Se todos têm o mesmo tema, mostra no select, senão deixa em "padrao" como padrão
+    if (temasSelecionados.length > 0 && new Set(temasSelecionados).size === 1) {
+      if (selectComponente) {
+        selectComponente.value = temasSelecionados[0];
       }
-      
-      inputsContainer.appendChild(componentForm);
-    });
+    } else {
+      if (selectComponente) {
+        selectComponente.value = 'padrao';
+      }
+    }
   }
 
+  // Funções antigas de cores removidas - agora usamos temas
   function applyColorsToSelected() {
-    if (!selectionState.selectedIds.length) return;
-    
-    const map = lerCustomColors();
-    
-    // Agrupa inputs por component-id
-    selectionState.selectedIds.forEach((componentId) => {
-      const inputs = document.querySelectorAll(`#comp-color-inputs-container input[data-component-id="${componentId}"]`);
-      const componentColorMap = {};
-      
-      inputs.forEach(input => {
-        const elementTag = input.getAttribute('data-element-tag');
-        const elementSelector = input.getAttribute('data-element-selector');
-        const property = input.getAttribute('data-property');
-        const value = input.value;
-        const isGroup = input.getAttribute('data-is-group') === 'true';
-        
-        if (elementSelector && property && value) {
-          // Para grupos, usa tag_property como chave
-          if (isGroup) {
-            const groupKey = `${elementTag}_${property}`;
-            componentColorMap[groupKey] = value; // Valor direto para grupos
-          } else {
-            if (!componentColorMap[elementSelector]) {
-              componentColorMap[elementSelector] = {};
-            }
-            componentColorMap[elementSelector][property] = value;
-          }
-        }
-      });
-      
-      map[String(componentId)] = componentColorMap;
-    });
-    
-    salvarCustomColors(map);
-    
-    renderCanvasPreview();
-    renderListaComponentes();
-    updateWrapperSelectionUI();
+    // Mantida para compatibilidade, mas não faz nada - agora usa temas
   }
   
   function applyColorsToComponentHtml() {
-    // Esta função apenas marca que as cores devem ser aplicadas
-    // A aplicação real acontece no renderCanvasPreview
+    // Mantida para compatibilidade
   }
 
   function resetColorsForSelected() {
-    const map = lerCustomColors();
+    // Agora remove tema ao invés de cores
     selectionState.selectedIds.forEach((id) => {
-      delete map[String(id)];
-      // Não precisa restaurar o HTML aqui, pois sempre usa _originalHtml como base
+      removerTemaComponente(id);
     });
-    salvarCustomColors(map);
     renderCanvasPreview();
     renderListaComponentes();
     updateWrapperSelectionUI();
-    updatePerComponentCustomizerUI(); // Atualiza inputs para mostrar cores originais
+    updatePerComponentCustomizerUI();
   }
 
   // -------------------
@@ -887,7 +1017,7 @@
 
   // clique fora limpa seleção
   document.addEventListener('click', (ev) => {
-    const inCanvas = ev.target.closest('#canvas, #per-comp-customizer, #global-customizer, .prototype-block');
+    const inCanvas = ev.target.closest('#canvas, #per-comp-theme-selector, #global-theme-selector, .prototype-block');
     if (!inCanvas) clearSelectedComponents();
   });
 
@@ -913,10 +1043,17 @@
     const canvas = document.getElementById('canvas');
     if (!canvas) return;
 
+    // Aplica temas salvos nos componentes ao carregar
+    const temasComponentes = lerTemasComponentes();
+    Object.keys(temasComponentes).forEach(id => {
+      const temaNome = temasComponentes[id];
+      aplicarTemaAComponente(Number(id), temaNome);
+    });
+
     renderListaComponentes();
     atualizarOrdemUI();
     renderCanvasPreview();
-    initCustomizer();
+    initThemeSelector();
 
     const btnLimpar = document.getElementById('btn-limpar');
     btnLimpar?.addEventListener('click', () => {
@@ -932,16 +1069,16 @@
         }
       });
 
-      salvarColorSettings(DEFAULT_COLORS);
-      applyColorSettings(DEFAULT_COLORS);
-      salvarCustomColors({});
-
-      const inpAccent = document.getElementById('color-accent');
-      const inpBg = document.getElementById('color-bg');
-      const inpText = document.getElementById('color-text');
-      if (inpAccent) inpAccent.value = DEFAULT_COLORS.accent;
-      if (inpBg) inpBg.value = DEFAULT_COLORS.background;
-      if (inpText) inpText.value = DEFAULT_COLORS.text;
+      // Remove todos os temas aplicados
+      const temas = lerTemasComponentes();
+      Object.keys(temas).forEach(id => {
+        removerTemaComponente(Number(id));
+      });
+      salvarTemasComponentes({});
+      salvarTemaGlobal('padrao');
+      
+      const selectGlobal = document.getElementById('select-tema-global');
+      if (selectGlobal) selectGlobal.value = 'padrao';
 
       clearSelectedComponents();
       renderCanvasPreview();
@@ -969,17 +1106,8 @@
       });
     }
 
-    const btnCompApply = document.getElementById('btn-comp-aplicar');
-    const btnCompReset = document.getElementById('btn-comp-resetar');
+    // Botões de tema já estão configurados em initThemeSelector
     const btnCompDelete = document.getElementById('btn-comp-excluir');
-    (btnCompApply)?.addEventListener('click', (e) => {
-      e.preventDefault();
-      applyColorsToSelected();
-    });
-    (btnCompReset)?.addEventListener('click', (e) => {
-      e.preventDefault();
-      resetColorsForSelected();
-    });
     (btnCompDelete)?.addEventListener('click', (e) => {
       e.preventDefault();
       excluirSelectedFromCanvas();
