@@ -24,11 +24,18 @@ body {
   background: var(--component-bg);
   display: flex;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   padding: var(--canvas-padding);
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+/* Quando não há conteúdo, centralizar a mensagem */
+.canvas-drop:empty,
+.canvas-drop:has(.text-muted:only-child) {
+  justify-content: center;
+  align-items: center;
 }
 
 /* preview box in the component list */
@@ -67,6 +74,7 @@ body {
   background: var(--component-bg, #ffffff);
   box-shadow: 0 0.5rem 1rem rgba(0,0,0,.08);
   padding: 12px;
+  align-self: center;
 }
 
 /* Blocos dentro do prototype (cada componente solto no canvas) */
