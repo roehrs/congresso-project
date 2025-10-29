@@ -247,6 +247,11 @@
     return tmp.innerHTML;
   }
 
+  function lerTemasComponentes() {
+    const raw = localStorage.getItem('simulador_temas_componentes');
+    return raw ? JSON.parse(raw) : {};
+  }
+
   function renderAssembledSite(ids, targetElId = 'resultado-canvas') {
     const container = document.getElementById(targetElId);
     if (!container) return;
@@ -255,6 +260,7 @@
     const comps = window.componentes || [];
     const colorsGlobal = lerColorSettings();
     const customMap = lerCustomColors();
+    const temasComponentes = lerTemasComponentes();
 
     const page = document.createElement('div');
     page.className = 'prototype-page';
@@ -265,6 +271,26 @@
     // montar blocos na ordem
     ids.forEach((id) => {
       const comp = comps.find((c) => c.id === id);
+      if (!comp) return;
+
+      // Prepara uma cópia do HTML do componente para aplicar tema se necessário
+      let htmlToUse = comp.html || `<div style="padding:8px;background:#f1f3f5;border-radius:6px">Componente #${id}</div>`;
+      
+      // Verifica se há tema aplicado para este componente
+      const temaAplicado = temasComponentes[String(id)];
+      if (temaAplicado && temaAplicado !== 'padrao') {
+        // Se o componente tem _originalHtml, usa ele como base (melhor prática)
+        // Caso contrário, usa o HTML atual (que pode já ter tema aplicado)
+        const htmlBase = comp._originalHtml || comp.html;
+        if (htmlBase && temaAplicado) {
+          // Aplica o tema temporariamente para renderização
+          htmlToUse = aplicarTemaParaRenderizacao(htmlBase, temaAplicado, comp.tipo || comp.categoria);
+        }
+      } else if (comp._originalHtml) {
+        // Se não tem tema ou é padrão, usa o HTML original
+        htmlToUse = comp._originalHtml;
+      }
+
       const wrapper = document.createElement('div');
       wrapper.className = 'prototype-block';
       wrapper.setAttribute('data-comp-id', String(id));
@@ -281,11 +307,130 @@
         wrapper.style.setProperty('--component-text', colorsGlobal.text);
       }
 
-      wrapper.innerHTML = sanitizeHtml(comp?.html || `<div style="padding:8px;background:#f1f3f5;border-radius:6px">Componente #${id}</div>`);
+      wrapper.innerHTML = sanitizeHtml(htmlToUse);
       page.appendChild(wrapper);
     });
 
     container.appendChild(page);
+  }
+
+  // Função auxiliar para aplicar tema ao HTML sem modificar o componente original
+  function aplicarTemaParaRenderizacao(htmlOriginal, temaNome, tipoComponente) {
+    // Define os temas (mesma estrutura do main.js)
+    const TEMAS = {
+      alto: {
+        porTipo: {
+          Navbar: { 'background-color': '#000000', 'background': '#000000', 'color': '#ffffff', 'border-color': '#ffffff' },
+          Footer: { 'background-color': '#000000', 'background': '#000000', 'color': '#ffffff', 'border-color': '#ffffff', 'border-top-color': '#ffffff' },
+          Section: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#000000', 'border-color': '#000000' },
+          Hero: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#000000', 'border-color': '#000000' },
+          Card: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#000000', 'border-color': '#000000' },
+          default: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#000000', 'border-color': '#000000' }
+        }
+      },
+      medio: {
+        porTipo: {
+          Navbar: { 'background-color': '#212529', 'background': '#212529', 'color': '#ffffff', 'border-color': '#495057' },
+          Footer: { 'background-color': '#212529', 'background': '#212529', 'color': '#ffffff', 'border-color': '#495057', 'border-top-color': '#495057' },
+          Section: { 'background-color': '#f8f9fa', 'background': '#f8f9fa', 'color': '#212529', 'border-color': '#dee2e6' },
+          Hero: { 'background-color': '#f8f9fa', 'background': '#f8f9fa', 'color': '#212529', 'border-color': '#dee2e6' },
+          Card: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#212529', 'border-color': '#dee2e6' },
+          default: { 'background-color': '#f8f9fa', 'background': '#f8f9fa', 'color': '#212529', 'border-color': '#dee2e6' }
+        }
+      },
+      baixo: {
+        porTipo: {
+          Navbar: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#6c757d', 'border-color': '#e9ecef' },
+          Footer: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#6c757d', 'border-color': '#e9ecef', 'border-top-color': '#e9ecef' },
+          Section: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#6c757d', 'border-color': '#f1f3f5' },
+          Hero: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#6c757d', 'border-color': '#f1f3f5' },
+          Card: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#6c757d', 'border-color': '#e9ecef' },
+          default: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#6c757d', 'border-color': '#e9ecef' }
+        }
+      }
+    };
+
+    if (!temaNome || !TEMAS[temaNome]) return htmlOriginal;
+
+    const tema = TEMAS[temaNome];
+    let tipo = tipoComponente || 'default';
+    if (tipo === 'Hero' || tipo === 'Gallery' || tipo === 'Contact') {
+      tipo = 'Section';
+    }
+
+    const coresPorTipo = tema.porTipo[tipo] || tema.porTipo.default || {};
+    if (!coresPorTipo || Object.keys(coresPorTipo).length === 0) return htmlOriginal;
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlOriginal;
+
+    const isNavOrFooter = tipo === 'Navbar' || tipo === 'Footer';
+    const allElements = tempDiv.querySelectorAll('[style]');
+    
+    allElements.forEach((el) => {
+      if (!el.hasAttribute('style')) return;
+      
+      let elementStyle = el.getAttribute('style');
+      const tagName = el.tagName.toLowerCase();
+      const propertiesToApply = [];
+      
+      const hasBgColor = /(?:^|;)\s*background-color\s*:/i.test(elementStyle);
+      if (hasBgColor) {
+        propertiesToApply.push('background-color');
+      } else {
+        const bgMatch = elementStyle.match(/(?:^|;)\s*background\s*:\s*([^;]+)/i);
+        if (bgMatch) {
+          const bgValue = bgMatch[1].trim();
+          if (!bgValue.includes('url(') && !bgValue.includes('image')) {
+            if (isNavOrFooter || (!bgValue.includes('gradient') && !bgValue.includes('rgba'))) {
+              propertiesToApply.push('background');
+            }
+          }
+        }
+      }
+      
+      const hasColor = /(?:^|;)\s*color\s*:/i.test(elementStyle);
+      if (hasColor) {
+        propertiesToApply.push('color');
+      }
+      
+      const hasBorderColor = /(?:^|;)\s*border(?:-[a-z-]+)?-color\s*:/i.test(elementStyle);
+      if (hasBorderColor) {
+        if (/border-top-color/i.test(elementStyle)) propertiesToApply.push('border-top-color');
+        else if (/border-bottom-color/i.test(elementStyle)) propertiesToApply.push('border-bottom-color');
+        else if (/border-left-color/i.test(elementStyle)) propertiesToApply.push('border-left-color');
+        else if (/border-right-color/i.test(elementStyle)) propertiesToApply.push('border-right-color');
+        else propertiesToApply.push('border-color');
+      }
+      
+      propertiesToApply.forEach(property => {
+        if (coresPorTipo[property]) {
+          const newColor = coresPorTipo[property];
+          const escapedProp = property.replace(/-/g, '\\-');
+          const regex = new RegExp(`(?:^|;)\\s*${escapedProp}\\s*:\\s*[^;]+`, 'gi');
+          
+          const hasProperty = regex.test(elementStyle);
+          regex.lastIndex = 0;
+          
+          if (hasProperty) {
+            elementStyle = elementStyle.replace(regex, (match) => {
+              if (isNavOrFooter && property === 'background' && match.includes('rgba')) {
+                return match.replace(/rgba?\([^)]+\)/, newColor);
+              }
+              return match.replace(/:\s*[^;]+/, ': ' + newColor);
+            });
+          } else if (property === 'background-color' || property === 'color') {
+            if (isNavOrFooter || tagName === 'nav' || tagName === 'footer' || tagName === 'a') {
+              elementStyle = (elementStyle.trim().endsWith(';') ? elementStyle : elementStyle + ';') + ` ${property}: ${newColor};`;
+            }
+          }
+        }
+      });
+      
+      el.setAttribute('style', elementStyle.trim());
+    });
+
+    return tempDiv.innerHTML;
   }
 
   // -------------------------
