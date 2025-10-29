@@ -661,6 +661,20 @@
   // Index / Persona pages
   // -------------------
   function initIndex() {
+    // Configura interatividade dos cards de dificuldade
+    document.querySelectorAll('.difficulty-card').forEach(card => {
+      card.addEventListener('click', () => {
+        // Remove active de todos
+        document.querySelectorAll('.difficulty-card').forEach(c => c.classList.remove('active'));
+        // Adiciona active no clicado
+        card.classList.add('active');
+        // Marca o radio correspondente
+        const dif = card.getAttribute('data-dif');
+        const radio = document.getElementById(`dif-${dif}`);
+        if (radio) radio.checked = true;
+      });
+    });
+
     const btn = document.getElementById('btn-comecar');
     if (!btn) return;
     btn.addEventListener('click', () => {
