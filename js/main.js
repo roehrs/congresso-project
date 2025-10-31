@@ -1113,9 +1113,80 @@
   };
 
   // -------------------
+  // Mobile menu handlers
+  // -------------------
+  function initMobileMenu() {
+    const componentsPanel = document.querySelector('.mobile-components-panel');
+    const themePanel = document.querySelector('.mobile-theme-panel');
+    const overlay = document.getElementById('mobile-overlay');
+    const btnCloseComponents = document.getElementById('btn-close-components');
+    const btnCloseThemes = document.getElementById('btn-close-themes');
+    const floatingComponentsBtn = document.getElementById('floating-components-btn');
+    const floatingThemeBtn = document.getElementById('floating-theme-btn');
+
+    function toggleComponentsPanel() {
+      if (!componentsPanel) return;
+      const arrowIcon = document.getElementById('arrow-icon');
+      const isOpen = componentsPanel.classList.contains('show');
+      if (isOpen) {
+        componentsPanel.classList.remove('show');
+        if (arrowIcon) arrowIcon.classList.remove('rotated');
+        document.body.style.overflow = '';
+      } else {
+        componentsPanel.classList.add('show');
+        if (arrowIcon) arrowIcon.classList.add('rotated');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeComponentsPanel() {
+      if (componentsPanel) componentsPanel.classList.remove('show');
+      const arrowIcon = document.getElementById('arrow-icon');
+      if (arrowIcon) arrowIcon.classList.remove('rotated');
+      document.body.style.overflow = '';
+    }
+
+    function openThemePanel() {
+      if (themePanel) themePanel.classList.add('show');
+      if (overlay) overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeThemePanel() {
+      if (themePanel) themePanel.classList.remove('show');
+      if (overlay) overlay.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    // Event listeners
+    btnCloseComponents?.addEventListener('click', closeComponentsPanel);
+    floatingComponentsBtn?.addEventListener('click', toggleComponentsPanel);
+    floatingThemeBtn?.addEventListener('click', openThemePanel);
+    btnCloseThemes?.addEventListener('click', closeThemePanel);
+    overlay?.addEventListener('click', () => {
+      closeComponentsPanel();
+      closeThemePanel();
+    });
+
+    // Fecha ao pressionar ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeComponentsPanel();
+        closeThemePanel();
+      }
+    });
+
+    // Exporta função para fechar painel (pode ser chamada após seleção de componente)
+    window.closeMobileComponentsPanel = closeComponentsPanel;
+  }
+
+  // -------------------
   // Editor init
   // -------------------
   function initEditor() {
+    // Inicializa menu mobile
+    initMobileMenu();
+
     // Renderiza persona no modal quando necessário
     const modalPersona = document.getElementById('modal-persona');
     if (modalPersona) {

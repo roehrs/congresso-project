@@ -137,3 +137,257 @@ body {
   .prototype-page { max-width: 100%; padding: 8px; }
   .componente-preview { height: 100px; max-height: 100px; }
 }
+
+/* Menu retrátil para tablets e mobile */
+@media (max-width: 991.98px) {
+  .mobile-components-panel {
+    display: none;
+    position: fixed;
+    top: 56px; /* Abaixo do navbar */
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: auto;
+    max-height: 40vh;
+    z-index: 1050;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease-in-out;
+    border-radius: 0;
+    overflow-y: auto;
+    border-bottom: 2px solid #dee2e6;
+    background: white;
+  }
+  
+  .mobile-components-panel.show {
+    display: block !important;
+    transform: translateY(0);
+  }
+  
+  .mobile-components-panel .card-body {
+    padding: 0;
+  }
+  
+  .mobile-components-panel .card-header {
+    display: none;
+  }
+  
+  /* Esconde título e resumo no mobile */
+  .mobile-components-panel h2,
+  .mobile-components-panel #resumo-componentes {
+    display: none;
+  }
+  
+  /* Componentes em row horizontal */
+  .mobile-components-panel #lista-componentes {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .mobile-components-panel #lista-componentes .componente-item {
+    flex: 0 0 auto;
+    min-width: 250px;
+    max-width: 300px;
+    height: auto;
+  }
+  
+  /* Rotação da seta quando aberto */
+  #arrow-icon.rotated {
+    transform: rotate(180deg);
+  }
+  
+  /* Esconde filtros no mobile */
+  .mobile-components-panel .btn-group {
+    display: none;
+  }
+  
+  /* Overlay quando o menu está aberto */
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1045;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  }
+  
+  .mobile-overlay.show {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  /* Painel de temas também retrátil */
+  .mobile-theme-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    max-width: 400px;
+    height: 100vh;
+    z-index: 1051;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    border-radius: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .mobile-theme-panel.show {
+    transform: translateX(0);
+  }
+  
+  .mobile-theme-panel .card-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: white;
+  }
+  
+  .mobile-theme-panel .card-body {
+    padding: 1rem;
+  }
+  
+  /* Botão flutuante para temas */
+  .floating-theme-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1040;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Melhorias para tablets */
+@media (max-width: 991.98px) and (min-width: 768px) {
+  /* Mantém largura total do painel de componentes */
+}
+
+/* Ajustes de layout mobile */
+@media (max-width: 767.98px) {
+  .hero-section {
+    padding: 1rem 0;
+    margin-bottom: 1rem;
+  }
+  
+  .hero-section h1 {
+    font-size: 1.25rem;
+  }
+  
+  .hero-section .display-5 {
+    font-size: 1.5rem !important;
+  }
+  
+  .hero-section .lead {
+    font-size: 1rem;
+  }
+  
+  .btn-group {
+    flex-wrap: wrap;
+  }
+  
+  .btn-group .btn {
+    font-size: 0.875rem;
+  }
+}
+
+/* Ajustes específicos para index.html */
+@media (max-width: 767.98px) {
+  .hero-section .display-5 {
+    font-size: 1.35rem !important;
+  }
+  
+  .hero-section .lead {
+    font-size: 0.9rem;
+  }
+  
+  .difficulty-card {
+    margin-bottom: 1rem;
+  }
+  
+  .start-button {
+    width: 100%;
+  }
+}
+
+/* Melhorias gerais de responsividade */
+@media (max-width: 991.98px) {
+  .mobile-theme-panel {
+    display: none !important;
+  }
+  
+  .mobile-theme-panel.show {
+    display: block !important;
+  }
+  
+  .col-lg-5,
+  .col-lg-3 {
+    margin-bottom: 1rem;
+  }
+  
+  .card-body h2,
+  .card-body h5 {
+    font-size: 1.1rem;
+  }
+  
+  #canvas {
+    min-height: 200px;
+  }
+  
+  .prototype-block {
+    margin-bottom: 8px;
+  }
+  
+  /* Canvas ocupa tela cheia no mobile */
+  main .row .col-lg-5 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  
+  /* Ajustes para persona e resultado */
+  .persona-card {
+    padding: 0.5rem;
+  }
+  
+  .feedback-list {
+    max-height: 200px;
+  }
+  
+  #resultado-canvas {
+    min-height: 300px;
+  }
+}
+
+/* Ajustes específicos para resultado.html */
+@media (max-width: 991.98px) {
+  .row-eq > [class*='col-'] {
+    display: flex !important;
+  }
+  
+  .card.h-100 {
+    display: flex !important;
+    flex-direction: column;
+  }
+  
+  #resultado-canvas {
+    flex: 0 1 auto !important;
+    max-height: 400px !important;
+    overflow-y: auto;
+  }
+  
+  .floating-menu-btn,
+  .floating-theme-btn {
+    display: none !important;
+  }
+}

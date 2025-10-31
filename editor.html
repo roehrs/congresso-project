@@ -24,12 +24,27 @@
         padding: 1.5rem 0;
         margin-bottom: 1.5rem;
       }
+      /* Ajuste específico para coluna de componentes no editor mobile */
+      @media (max-width: 991.98px) {
+        .col-lg-4 {
+          width: 0 !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          overflow: visible !important;
+        }
+      }
     </style>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="position: relative; z-index: 1070;">
+      <div class="container-fluid">
         <a class="navbar-brand" href="index.html">Simulador de Layouts</a>
+        <!-- Botão dropdown para componentes mobile -->
+        <button class="btn btn-primary d-lg-none" id="floating-components-btn" aria-label="Abrir componentes">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" style="transition: transform 0.3s;" id="arrow-icon">
+            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+          </svg>
+        </button>
       </div>
     </nav>
 
@@ -45,9 +60,19 @@
       <div class="row g-4">
         <!-- Coluna esquerda: lista de componentes -->
         <div class="col-12 col-lg-4">
-          <div class="card shadow-sm h-100">
+          <div class="card shadow-sm h-100 mobile-components-panel">
+            <div class="card-header d-lg-none bg-white border-bottom">
+              <div class="d-flex justify-content-between align-items-center">
+                <h2 class="h6 mb-0">Componentes</h2>
+                <button class="btn btn-sm btn-outline-secondary" id="btn-close-components">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
             <div class="card-body">
-              <h2 class="h5">Componentes disponíveis</h2>
+              <h2 class="h5 d-none d-lg-block">Componentes disponíveis</h2>
               <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
                 <div class="btn-group" role="group" aria-label="Filtro por tipo">
                   <button type="button" class="btn btn-outline-secondary btn-sm active" data-filter="Todos">Todos</button>
@@ -71,12 +96,12 @@
         <div class="col-12 col-lg-5">
           <div class="card shadow-sm h-100">
             <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-2 mb-3">
                 <h2 class="h5 mb-0">Canvas do layout</h2>
-                <div class="d-flex gap-2">
+                <div class="d-flex flex-wrap gap-2 w-100 w-lg-auto">
                   <button id="btn-ver-persona" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#modal-persona">Ver Persona</button>
                   <button id="btn-limpar" class="btn btn-outline-danger btn-sm">Limpar</button>
-                  <button id="btn-finalizar" class="btn btn-success" disabled>Finalizar (mínimo 3 componentes)</button>
+                  <button id="btn-finalizar" class="btn btn-success btn-sm flex-grow-1 flex-lg-grow-0" disabled>Finalizar</button>
                 </div>
               </div>
 
@@ -94,9 +119,19 @@
 
         <!-- Painel direito: escolha de tema -->
         <div class="col-12 col-lg-3">
-          <div class="card shadow-sm h-100">
+          <div class="card shadow-sm h-100 mobile-theme-panel">
+            <div class="card-header d-lg-none bg-white border-bottom">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="h6 mb-0">Temas</h5>
+                <button class="btn btn-sm btn-outline-secondary" id="btn-close-themes">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
             <div class="card-body">
-              <h5 class="h6 mb-3">Escolha de Tema</h5>
+              <h5 class="h6 mb-3 d-none d-lg-block">Escolha de Tema</h5>
 
               <!-- Seleção quando nenhum componente está selecionado -->
               <div id="global-theme-selector">
@@ -142,6 +177,16 @@
 
       </div>
     </main>
+
+    <!-- Overlay para mobile/tablet -->
+    <div class="mobile-overlay d-lg-none" id="mobile-overlay"></div>
+
+    <!-- Botões flutuantes para mobile/tablet -->
+    <button class="btn btn-success floating-theme-btn d-lg-none" id="floating-theme-btn" aria-label="Abrir temas">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+      </svg>
+    </button>
 
     <!-- Modal da Persona -->
     <div class="modal fade" id="modal-persona" tabindex="-1" aria-labelledby="modal-persona-label" aria-hidden="true">
