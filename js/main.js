@@ -838,10 +838,6 @@
               ${comp.html || '<div class="text-muted small">Sem preview disponível</div>'}
             </div>
           </div>
-
-          <div class="mt-3 d-flex justify-content-end">
-            <button class="btn btn-sm btn-primary select-btn" data-id="${comp.id}">Selecionar</button>
-          </div>
         </div>
       `;
       lista.appendChild(item);
@@ -857,9 +853,9 @@
         previewInner.style.setProperty('--component-text', DEFAULT_COLORS.text);
       }
 
-      const btn = item.querySelector('.select-btn');
-      btn?.addEventListener('click', () => {
-        const id = Number(btn.getAttribute('data-id'));
+      // Adiciona evento de clique no card inteiro
+      item.addEventListener('click', () => {
+        const id = comp.id;
         window.selectComponent(id);
       });
     });
@@ -1110,6 +1106,11 @@
     atualizarOrdemUI();
     renderCanvasPreview();
     atualizarEstadoBotaoFinalizar();
+    
+    // Fecha o painel mobile se estiver aberto
+    if (window.closeMobileComponentsPanel) {
+      window.closeMobileComponentsPanel();
+    }
   };
 
   // -------------------
@@ -1148,13 +1149,12 @@
 
     function openThemePanel() {
       if (themePanel) themePanel.classList.add('show');
-      if (overlay) overlay.classList.add('show');
+      // Não mostrar overlay para painel de baixo
       document.body.style.overflow = 'hidden';
     }
 
     function closeThemePanel() {
       if (themePanel) themePanel.classList.remove('show');
-      if (overlay) overlay.classList.remove('show');
       document.body.style.overflow = '';
     }
 
