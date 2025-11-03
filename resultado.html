@@ -175,10 +175,6 @@
               <h6 class="mb-2 small">Feedback</h6>
               <ul id="lista-feedback" class="mb-3 small feedback-list"></ul>
 
-              <details id="ordem-details" class="mb-3">
-                <summary class="small">Detalhes da avaliação de ordem</summary>
-              </details>
-
               <div class="small text-muted mb-2">
                 Tentativas restantes: <span id="tentativas-restantes">0</span>
               </div>
@@ -193,15 +189,55 @@
       </div>
     </main>
 
+    <!-- Modal de Certificado -->
+    <div class="modal fade" id="modal-certificado" tabindex="-1" aria-labelledby="modal-certificado-label" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modal-certificado-label">🎉 Certificado de Nota 100!</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="text-center mb-4">
+              <h4>Certificado de Excelência</h4>
+              <p class="lead">Parabéns! Você atingiu 100/100 na avaliação!</p>
+              <div class="border p-4 bg-light">
+                <p class="mb-2">Este certificado comprova que você:</p>
+                <ul class="text-start list-unstyled">
+                  <li>✔ Selecionou os componentes ideais para a persona</li>
+                  <li>✔ Posicionou os componentes na ordem correta</li>
+                  <li>✔ Aplicou os temas apropriados</li>
+                  <li>✔ Criou um layout acessível e de qualidade</li>
+                </ul>
+              </div>
+            </div>
+            <div>
+              <label for="certificado-email" class="form-label">Receber certificado por e-mail (opcional):</label>
+              <div class="input-group">
+                <input type="email" class="form-control" id="certificado-email" placeholder="seu@email.com">
+                <button class="btn btn-primary" id="btn-enviar-certificado">Enviar</button>
+              </div>
+              <small class="text-muted d-block mt-2">Ou simplesmente feche esta janela para voltar.</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <footer class="bg-dark text-white text-center py-3 mt-auto">
       <div class="container">
         <p class="mb-0 small">Desenvolvido por Vinícius Alves Fantin, Bruno César Silva de Souza, Diogo Roehrs e Vitor Hugo Lopes</p>
       </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="js/componentes.js"></script>
     <script src="js/componentes-extra.js"></script>
     <script src="js/avaliacao.js"></script>
+    <script src="js/certificado.js"></script>
     <script>
       (function () {
         const KEY = 'simulador_retries';
@@ -255,6 +291,24 @@
           // Reseta todos os temas ao padrão antes de encerrar
           resetarTodosTemasAoPadrao();
           window.location.href = 'index.html';
+        });
+
+        document.getElementById('btn-enviar-certificado')?.addEventListener('click', () => {
+          const email = document.getElementById('certificado-email')?.value.trim();
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          
+          if (!email) {
+            alert('Por favor, insira um e-mail válido.');
+            return;
+          }
+          
+          if (!emailRegex.test(email)) {
+            alert('Por favor, insira um e-mail válido.');
+            return;
+          }
+          
+          // Enviar certificado por email
+          enviarCertificadoPorEmail(email);
         });
 
         document.addEventListener('DOMContentLoaded', () => {

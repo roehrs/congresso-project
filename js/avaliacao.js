@@ -32,7 +32,21 @@
   // -----------------------------
   const NAVBAR_TYPES = new Set(['Navbar', 'navbar']);
   const FOOTER_TYPES = new Set(['Footer', 'footer']);
-  const SECTION_TYPES = new Set(['Section', 'section', 'Hero', 'Gallery', 'Contact', 'Card', 'Cards', 'card']);
+  const SECTION_TYPES = new Set(['Section', 'section', 'Hero', 'Gallery', 'Contact', 'Card', 'Cards', 'card', 'Cards informativos']);
+  
+  // Função auxiliar para normalizar tipos para comparação
+  function normalizarTipo(tipo) {
+    if (!tipo) return tipo;
+    const t = tipo.toLowerCase().trim();
+    if (t.includes('card')) return 'Card';
+    if (t.includes('section')) return 'Section';
+    if (t.includes('navbar')) return 'Navbar';
+    if (t.includes('footer')) return 'Footer';
+    if (t.includes('hero')) return 'Hero';
+    if (t.includes('gallery')) return 'Gallery';
+    if (t.includes('contact')) return 'Contact';
+    return tipo;
+  }
 
   const PENALTY_NAVBAR_NOT_FIRST = 20;
   const PENALTY_FOOTER_NOT_LAST = 20;
@@ -72,7 +86,7 @@
     const footerIndex = mapped.findIndex((c) => FOOTER_TYPES.has(c.tipo));
     const sectionIndexes = mapped
       .map((c, i) => ({ c, i }))
-      .filter(({ c }) => SECTION_TYPES.has(c.tipo))
+      .filter(({ c }) => SECTION_TYPES.has(c.tipo) || SECTION_TYPES.has(c.categoria))
       .map(({ i }) => i);
 
     if (sectionIndexes.length === 0) {
@@ -141,71 +155,103 @@
       .map((id) => window.componentes.find((c) => c.id === id))
       .filter(Boolean);
 
-    // --- 1) Score de compatibilidade por acessibilidade (0..100)
-    let accessPoints = 0;
+    if (selecionados.length === 0) {
+      return { score: 0, feedback: ['Nenhum componente selecionado. Tente montar um layout.'], ordemEvaluation: avaliarOrdem(idsComponentes) };
+    }
+
+    // === INÍCIO COM 100 PONTOS ===
+    let score = 100;
+
+    // === 1. DESCONTO POR ACESSIBILIDADE DOS COMPONENTES ===
+    const w = persona.weightings || { access: 0.35, required: 0.40, preferred: 0.25 };
+    let accessPenalty = 0;
+    
     selecionados.forEach((comp) => {
-      if (persona.preferencia === 'alta' && comp.acessibilidade === 'alta') {
-        accessPoints += 2;
-        feedback.push(`✔ ${comp.tipo}: boa escolha para alta acessibilidade.`);
-      } else if (persona.preferencia === 'media' && (comp.acessibilidade === 'media' || comp.acessibilidade === 'alta')) {
-        accessPoints += 1.5;
-        feedback.push(`✔ ${comp.tipo}: atende a preferência média/alta.`);
-      } else if (persona.preferencia === 'baixa' && (comp.acessibilidade === 'baixa' || comp.acessibilidade === 'media')) {
-        accessPoints += 1;
-        feedback.push(`✔ ${comp.tipo}: combina com preferência visual/dinâmica.`);
-      } else {
-        accessPoints -= 1.5;
-        feedback.push(`✖ ${comp.tipo}: não combina com preferência ${persona.preferencia}.`);
+      if (persona.preferencia === 'alta') {
+        if (comp.acessibilidade === 'alta') {
+          feedback.push(`✔ ${comp.tipo} (${comp.id}): Excelente para alta acessibilidade.`);
+        } else if (comp.acessibilidade === 'media') {
+          accessPenalty += (w.access * 100 * 0.15); // 15% de desconto
+          feedback.push(`⚠ ${comp.tipo} (${comp.id}): Aceitável mas não ideal para alta acessibilidade.`);
+        } else if (comp.acessibilidade === 'baixa') {
+          accessPenalty += (w.access * 100 * 0.40); // 40% de desconto
+          feedback.push(`✖ ${comp.tipo} (${comp.id}): Inadequado para alta acessibilidade.`);
+        }
+      } else if (persona.preferencia === 'media') {
+        if (comp.acessibilidade === 'media') {
+          feedback.push(`✔ ${comp.tipo} (${comp.id}): Ideal para acessibilidade média.`);
+        } else if (comp.acessibilidade === 'alta') {
+          feedback.push(`✔ ${comp.tipo} (${comp.id}): Boa para acessibilidade média.`);
+        } else if (comp.acessibilidade === 'baixa') {
+          accessPenalty += (w.access * 100 * 0.20); // 20% de desconto
+          feedback.push(`⚠ ${comp.tipo} (${comp.id}): Apenas adequado para acessibilidade média.`);
+        }
+      } else if (persona.preferencia === 'baixa') {
+        if (comp.acessibilidade === 'baixa') {
+          feedback.push(`✔ ${comp.tipo} (${comp.id}): Perfeito para design minimalista.`);
+        } else if (comp.acessibilidade === 'media') {
+          feedback.push(`✔ ${comp.tipo} (${comp.id}): Adequado para design visual.`);
+        } else if (comp.acessibilidade === 'alta') {
+          accessPenalty += (w.access * 100 * 0.30); // 30% de desconto
+          feedback.push(`⚠ ${comp.tipo} (${comp.id}): Muito pesado para design minimalista.`);
+        }
       }
     });
 
-    const n = Math.max(1, selecionados.length);
-    const maxAP = 2 * n;
-    const minAP = -1.5 * n;
-    const accessScore = Math.round(((accessPoints - minAP) / (maxAP - minAP)) * 100);
-
-    // --- 2) Requisitos de seções obrigatórias
-    let requiredScore = 100;
-    if (Array.isArray(persona.requiredSections) && persona.requiredSections.length > 0) {
+    // === 2. DESCONTO POR SEÇÕES REQUERIDAS AUSENTES ===
+    const requiredSections = persona.requiredSections || [];
+    let requiredPenalty = 0;
+    
+    if (requiredSections.length > 0) {
       const tiposSelecionados = selecionados.map((c) => c.tipo);
-      const totalReq = persona.requiredSections.length;
-      let found = 0;
-      persona.requiredSections.forEach((req) => {
-        if (tiposSelecionados.includes(req)) {
-          found += 1;
+      // Normaliza tipos para comparação
+      const tiposSelecionadosNorm = tiposSelecionados.map(t => normalizarTipo(t));
+      let foundCount = 0;
+      
+      requiredSections.forEach((req) => {
+        const reqNorm = normalizarTipo(req);
+        if (tiposSelecionadosNorm.includes(reqNorm)) {
+          foundCount++;
+          feedback.push(`✔ Seção requerida presente: ${req}.`);
         } else {
-          feedback.push(`✖ Faltando seção requerida: ${req}.`);
+          feedback.push(`✖ Seção requerida ausente: ${req}.`);
         }
       });
-      if (found > 0) feedback.push(`✔ ${found}/${totalReq} seções requeridas presentes.`);
-      requiredScore = Math.round((found / totalReq) * 100);
-    } else {
-      requiredScore = 100;
-    }
-
-    // --- 3) Preferências de tipo (bônus)
-    let preferredScore = 50;
-    if (Array.isArray(persona.preferredTypes) && persona.preferredTypes.length > 0 && selecionados.length > 0) {
-      const tiposSelecionados = selecionados.map((c) => c.tipo);
-      const matches = tiposSelecionados.filter((t) => persona.preferredTypes.includes(t)).length;
-      preferredScore = Math.round((matches / selecionados.length) * 100);
-      if (matches > 0) feedback.push(`✔ ${matches} componente(s) entre os preferidos.`);
-    }
-
-    // --- 4) Penalidade por componentes proibidos
-    let forbiddenPenalty = 0;
-    if (Array.isArray(persona.forbiddenTypes) && persona.forbiddenTypes.length > 0) {
-      const tiposSelecionados = selecionados.map((c) => c.tipo);
-      const forbiddenFound = tiposSelecionados.filter((t) => persona.forbiddenTypes.includes(t));
-      if (forbiddenFound.length > 0) {
-        feedback.push(`✖ Componentes não recomendados detectados: ${forbiddenFound.join(', ')}.`);
-        forbiddenPenalty = Math.min(30, forbiddenFound.length * 10);
+      
+      const missingSections = requiredSections.length - foundCount;
+      if (missingSections > 0) {
+        requiredPenalty = (missingSections / requiredSections.length) * (w.required * 100);
+        
+        if (foundCount === 0) {
+          feedback.push(`⚠ Nenhuma seção requerida foi encontrada no layout.`);
+        } else {
+          feedback.push(`⚠ Apenas ${foundCount}/${requiredSections.length} seções requeridas encontradas.`);
+        }
       }
     }
 
-    // --- 5) Avaliação de temas aplicados aos componentes
+    // === 3. DESCONTO POR COMPONENTES PROIBIDOS ===
+    let forbiddenPenalty = 0;
+    const forbiddenTypes = persona.forbiddenTypes || [];
+    
+    if (forbiddenTypes.length > 0) {
+      const tiposSelecionados = selecionados.map((c) => c.tipo);
+      // Normaliza tipos para comparação
+      const tiposSelecionadosNorm = tiposSelecionados.map(t => normalizarTipo(t));
+      const forbiddenTypesNorm = forbiddenTypes.map(t => normalizarTipo(t));
+      const forbiddenFound = tiposSelecionadosNorm.filter((t, idx) => forbiddenTypesNorm.includes(t));
+      
+      if (forbiddenFound.length > 0) {
+        forbiddenPenalty = Math.min(40, forbiddenFound.length * 15);
+        const forbiddenNames = tiposSelecionados.filter((t, idx) => forbiddenTypesNorm.includes(tiposSelecionadosNorm[idx]));
+        feedback.push(`✖ Componente(s) não permitido(s): ${forbiddenNames.join(', ')}.`);
+        feedback.push(`⚠ Penalidade aplicada: ${forbiddenPenalty} pontos.`);
+      }
+    }
+
+    // === 4. DESCONTO POR TEMAS INADEQUADOS ===
     const temasComponentes = lerTemasComponentes();
-    const temaGlobal = lerTemaGlobal();
+    let temaPenalty = 0;
     
     // Mapeamento: preferência da persona -> tema ideal
     const temaIdealPorPreferencia = {
@@ -215,109 +261,88 @@
     };
     
     const temaIdeal = temaIdealPorPreferencia[persona.preferencia] || 'medio';
-    let temaScore = 50; // Score inicial neutro
-    let componentesComTema = 0;
     let componentesComTemaIdeal = 0;
-    let componentesSemTema = 0;
+    let componentesComTemaOposto = 0;
     
-    // Verifica temas aplicados por componente
     idsComponentes.forEach((id) => {
       const temaAplicado = temasComponentes[String(id)];
       if (temaAplicado && temaAplicado !== 'padrao') {
-        componentesComTema++;
         if (temaAplicado === temaIdeal) {
           componentesComTemaIdeal++;
         }
-      } else {
-        componentesSemTema++;
+        
+        // Verifica se é tema oposto
+        const temaOposto = temaIdeal === 'alto' ? 'baixo' : (temaIdeal === 'baixo' ? 'alto' : 'medio');
+        if (temaAplicado === temaOposto) {
+          componentesComTemaOposto++;
+        }
       }
     });
     
-    // Calcula score baseado em quantos componentes têm o tema ideal
+    const componentesSemTema = idsComponentes.length - componentesComTemaIdeal - componentesComTemaOposto;
+    
     if (idsComponentes.length > 0) {
       const totalComponentes = idsComponentes.length;
-      
-      // Bônus proporcional para componentes com tema ideal
       const percentualIdeal = (componentesComTemaIdeal / totalComponentes) * 100;
       
-      // Se todos os componentes têm o tema ideal
-      if (componentesComTemaIdeal === totalComponentes && componentesComTema > 0) {
-        temaScore = 100;
-        feedback.push(`✔ Todos os componentes usam o tema ideal (${temaIdeal} contraste) para ${persona.preferencia} acessibilidade.`);
-      } 
-      // Se a maioria tem o tema ideal
-      else if (percentualIdeal >= 60) {
-        temaScore = 70 + Math.round(percentualIdeal * 0.3); // 70-91
+      if (componentesComTemaIdeal === totalComponentes && componentesComTemaIdeal > 0) {
+        feedback.push(`✔ Todos os componentes usam o tema ideal (${temaIdeal} contraste) para ${persona.preferencia} acessibilidade!`);
+      } else if (percentualIdeal >= 75) {
+        temaPenalty = 5;
+        feedback.push(`✔ A maioria esmagadora dos componentes (${Math.round(percentualIdeal)}%) usa o tema ideal!`);
+      } else if (percentualIdeal >= 50) {
+        temaPenalty = 15;
         feedback.push(`✔ A maioria dos componentes (${Math.round(percentualIdeal)}%) usa o tema ideal.`);
-      }
-      // Se alguns têm o tema ideal
-      else if (componentesComTemaIdeal > 0) {
-        temaScore = 40 + Math.round(percentualIdeal * 0.4); // 40-64
-        feedback.push(`⚠ Apenas ${componentesComTemaIdeal}/${totalComponentes} componente(s) usa(m) o tema ideal (${temaIdeal} contraste).`);
-      }
-      // Se nenhum tem tema ou todos usam tema padrão/errado
-      else if (componentesSemTema === totalComponentes) {
-        temaScore = 30;
-        feedback.push(`⚠ Nenhum tema aplicado. Recomenda-se usar tema "${temaIdeal}" para ${persona.preferencia} acessibilidade.`);
+      } else if (componentesComTemaIdeal > 0) {
+        temaPenalty = 30;
+        feedback.push(`⚠ Apenas ${componentesComTemaIdeal}/${totalComponentes} componente(s) usa(m) o tema ideal.`);
+      } else if (componentesComTemaOposto > 0) {
+        temaPenalty = 50;
+        feedback.push(`✖ ${componentesComTemaOposto} componente(s) usa(m) tema oposto (${temaIdeal === 'alto' ? 'baixo' : 'alto'} contraste)!`);
       } else {
-        temaScore = 20;
-        feedback.push(`✖ Os temas aplicados não correspondem ao ideal (${temaIdeal} contraste) para ${persona.preferencia} acessibilidade.`);
-      }
-      
-      // Penalidade se usar tema completamente oposto
-      const temaOposto = temaIdeal === 'alto' ? 'baixo' : (temaIdeal === 'baixo' ? 'alto' : 'medio');
-      const componentesComTemaOposto = idsComponentes.filter(id => {
-        const tema = temasComponentes[String(id)];
-        return tema === temaOposto;
-      }).length;
-      
-      if (componentesComTemaOposto > 0 && componentesComTemaIdeal === 0) {
-        temaScore = Math.max(0, temaScore - 20);
-        feedback.push(`✖ ${componentesComTemaOposto} componente(s) usa(m) tema oposto (${temaOposto} contraste), prejudicando a ${persona.preferencia} acessibilidade.`);
+        temaPenalty = 40;
+        feedback.push(`⚠ Nenhum tema aplicado. Use tema "${temaIdeal}" para melhor ${persona.preferencia} acessibilidade.`);
       }
     }
 
-    // --- 6) Combina os sub-scores usando pesos da persona (fallbacks)
-    const w = persona.weightings || { access: 0.4, required: 0.4, preferred: 0.2 };
-    
-    // Adiciona peso para tema (10-15% do score total)
-    const pesoTema = 0.12; // 12% do score final
-    const pesoAjustado = {
-      access: (w.access ?? 0.4) * (1 - pesoTema),
-      required: (w.required ?? 0.4) * (1 - pesoTema),
-      preferred: (w.preferred ?? 0.2) * (1 - pesoTema)
-    };
-    
-    const rawScore = (accessScore * pesoAjustado.access)
-                   + (requiredScore * pesoAjustado.required)
-                   + (preferredScore * pesoAjustado.preferred)
-                   + (temaScore * pesoTema);
-
-    let score = Math.round(rawScore - forbiddenPenalty);
-
-    // --- 7) Avaliação de ordem (integração)
-    // aplicamos penalidades de ordem diretamente ao score final
+    // === 5. DESCONTO POR ORDEM ERRADA ===
     const ordemResult = avaliarOrdem(Array.isArray(idsComponentes) ? idsComponentes : []);
-    let ordemPenaltyTotal = 0;
-    if (Array.isArray(ordemResult.penalties) && ordemResult.penalties.length > 0) {
-      ordemPenaltyTotal = ordemResult.penalties.reduce((s, p) => s + (p.value || 0), 0);
-      // anexa feedback de ordem ao retorno principal
-      ordemResult.feedback.forEach((f) => feedback.push(`✖ ${f}`));
+    const ordemPenalty = 100 - ordemResult.score;
+    
+    // Adiciona feedback de ordem
+    ordemResult.feedback.forEach((f) => {
+      if (f.includes('✔')) feedback.push(f);
+      else if (f.includes('✖')) feedback.push(f);
+      else feedback.push(`✔ ${f}`);
+    });
+
+    // === 6. CALCULA SCORE FINAL (DESCONTA TUDO) ===
+    score -= Math.round(accessPenalty);
+    score -= Math.round(requiredPenalty);
+    score -= Math.round(temaPenalty);
+    score -= Math.round(ordemPenalty);
+    score -= Math.round(forbiddenPenalty);
+    
+    // Ajusta se necessário
+    score = Math.max(0, Math.min(100, score));
+
+    // === 7. MENSAGEM FINAL ===
+    let mensagemFinal = '';
+    if (score >= 90) {
+      mensagemFinal = '🎉 Excelente! Seu layout atende perfeitamente às necessidades da persona!';
+    } else if (score >= 70) {
+      mensagemFinal = '👍 Bom trabalho! O layout atende bem às necessidades da persona.';
+    } else if (score >= 50) {
+      mensagemFinal = '⚠️ Layout razoável, mas pode ser melhorado considerando as necessidades da persona.';
+    } else if (score >= 30) {
+      mensagemFinal = '⚠️ Layout precisa de melhorias significativas para atender às necessidades da persona.';
+    } else {
+      mensagemFinal = '❌ O layout não atende adequadamente às necessidades da persona.';
     }
+    
+    feedback.unshift(mensagemFinal);
+    feedback.unshift(`Pontuação: ${score}/100`);
 
-    // ajusta score com penalidade de ordem
-    score = score - ordemPenaltyTotal;
-
-    // mensagens finais e normalização
-    if (selecionados.length === 0) {
-      feedback.unshift('Nenhum componente selecionado. Tente montar um layout.');
-      score = 0;
-    }
-
-    score = Math.max(0, Math.min(100, Math.round(score)));
-    feedback.unshift(`Pontuação final: ${score}/100`);
-
-    // incluir detalhes de ordem no retorno para possível uso na UI
     return { score, feedback, ordemEvaluation: ordemResult };
   }
 
@@ -518,7 +543,7 @@
       
       el.setAttribute('style', elementStyle.trim());
     });
-
+    
     return tempDiv.innerHTML;
   }
 
@@ -558,11 +583,13 @@
 
     // renderiza o site montado no canvas da página de resultado
     renderAssembledSite(ids, 'resultado-canvas');
-
-    // opcional: mostrar detalhes da avaliação de ordem (colapsível)
-    const ordemDetails = document.getElementById('ordem-details');
-    if (ordemDetails) {
-      ordemDetails.innerHTML = `<pre style="white-space:pre-wrap">${JSON.stringify(ordemEvaluation, null, 2)}</pre>`;
+    
+    // Abre modal de certificado se pontuação for 100
+    if (score === 100) {
+      setTimeout(() => {
+        const modal = new bootstrap.Modal(document.getElementById('modal-certificado'));
+        modal.show();
+      }, 1000);
     }
   }
 

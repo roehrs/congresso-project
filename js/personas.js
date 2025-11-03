@@ -31,7 +31,7 @@ window.personas = [
     contact: 'lucas@example.com',
     requiredSections: ['Gallery'],
     preferredTypes: ['Section', 'Card'],
-    forbiddenTypes: ['Footer'],
+    forbiddenTypes: [],
     weightings: { access: 0.30, required: 0.50, preferred: 0.20 }
   },
   {

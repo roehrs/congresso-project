@@ -749,6 +749,11 @@
   // preferência (por acessibilidade)
   const preferencia = persona.preferencia || persona.preference || '—';
     const preferenciaLabel = preferencia === 'alta' ? 'Alta' : preferencia === 'media' ? 'Média' : preferencia === 'baixa' ? 'Baixa' : preferencia;
+  
+  // tipos preferidos e proibidos
+  const preferredTypes = Array.isArray(persona.preferredTypes) ? persona.preferredTypes : [];
+  const forbiddenTypes = Array.isArray(persona.forbiddenTypes) ? persona.forbiddenTypes : [];
+  const requiredSections = Array.isArray(persona.requiredSections) ? persona.requiredSections : [];
 
   const html = `
     <div class="persona-card">
@@ -766,6 +771,30 @@
               <div class="persona-preferencia">${preferenciaLabel} Contraste</div>
             </div>
         </div>
+
+        ${requiredSections.length ? `
+            <div class="persona-section">
+              <div class="persona-section-title">Seções Obrigatórias</div>
+              <div class="persona-badges">
+                ${requiredSections.map((req) => `<span class="badge bg-danger">${String(req)}</span>`).join(' ')}
+              </div>
+          </div>` : ''}
+
+        ${preferredTypes.length ? `
+            <div class="persona-section">
+              <div class="persona-section-title">Tipos de Componentes Preferidos</div>
+              <div class="persona-badges">
+                ${preferredTypes.map((t) => `<span class="badge bg-success">${String(t)}</span>`).join(' ')}
+              </div>
+          </div>` : ''}
+
+        ${forbiddenTypes.length ? `
+            <div class="persona-section">
+              <div class="persona-section-title">Tipos de Componentes NÃO Preferidos</div>
+              <div class="persona-badges">
+                ${forbiddenTypes.map((t) => `<span class="badge bg-warning text-dark">${String(t)}</span>`).join(' ')}
+              </div>
+          </div>` : ''}
 
         ${gostos.length ? `
             <div class="persona-section">
