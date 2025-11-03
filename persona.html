@@ -11,6 +11,7 @@
         height: 100%;
         display: flex;
         flex-direction: column;
+        font-size: 1.125rem;
       }
       body {
         min-height: 100vh;
@@ -18,11 +19,23 @@
       main {
         flex: 1;
       }
+      h1 {
+        font-size: 2rem !important;
+      }
       .hero-section {
         background: linear-gradient(135deg, #212529 0%, #495057 100%);
         color: white;
         padding: 2rem 0;
         margin-bottom: 2rem;
+      }
+      .navbar-brand {
+        font-size: 1.5rem !important;
+      }
+      footer {
+        font-size: 1rem !important;
+      }
+      .btn {
+        font-size: 1.1rem !important;
       }
       
       /* Layout melhorado da ficha */
@@ -37,21 +50,21 @@
       }
 
       .persona-name {
-        font-size: 1.75rem;
+        font-size: 2rem;
         font-weight: 700;
         color: #212529;
         margin-bottom: 0.5rem;
       }
 
       .persona-role {
-        font-size: 1rem;
+        font-size: 1.25rem;
         color: #6c757d;
         font-weight: 500;
         margin-bottom: 0.75rem;
       }
 
       .persona-briefing {
-        font-size: 1rem;
+        font-size: 1.125rem;
         color: #495057;
         line-height: 1.6;
         margin-bottom: 1.5rem;
@@ -66,7 +79,7 @@
       }
 
       .persona-section-title {
-        font-size: 0.875rem;
+        font-size: 1rem;
         font-weight: 700;
         color: #495057;
         text-transform: uppercase;
@@ -92,7 +105,7 @@
         color: white;
         border-radius: 20px;
         font-weight: 600;
-        font-size: 0.95rem;
+        font-size: 1.1rem;
         margin-top: 0.25rem;
       }
 
@@ -100,19 +113,49 @@
         margin-right: 0.5rem;
         margin-bottom: 0.5rem;
         padding: 0.5rem 0.75rem;
-        font-size: 0.875rem;
+        font-size: 1rem;
         font-weight: 500;
         border-radius: 6px;
       }
 
       .persona-meta {
-        font-size: 0.95rem;
+        font-size: 1.1rem;
         color: #495057;
         line-height: 1.6;
       }
 
       /* Responsivo: empilha em telas pequenas */
       @media (max-width: 768px) {
+        html, body {
+          font-size: 1rem;
+        }
+        h1 {
+          font-size: 1.75rem !important;
+        }
+        .persona-name {
+          font-size: 1.75rem;
+        }
+        .persona-role {
+          font-size: 1.125rem;
+        }
+        .persona-briefing {
+          font-size: 1rem;
+        }
+        .persona-section-title {
+          font-size: 0.95rem;
+        }
+        .persona-preferencia {
+          font-size: 1rem;
+        }
+        .persona-badges .badge {
+          font-size: 0.9rem;
+        }
+        .persona-meta {
+          font-size: 1rem;
+        }
+        .btn {
+          font-size: 1rem !important;
+        }
         .persona-header {
           text-align: center;
         }
