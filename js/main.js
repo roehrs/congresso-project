@@ -403,6 +403,11 @@
       renderCanvasPreview();
       renderListaComponentes();
       updateWrapperSelectionUI();
+      
+      // Fecha painel de temas no mobile
+      if (window.closeMobileThemePanel && window.innerWidth <= 900) {
+        window.closeMobileThemePanel();
+      }
     });
 
     btnResetGlobal?.addEventListener('click', () => {
@@ -414,6 +419,11 @@
       if (selectGlobal) selectGlobal.value = 'padrao';
       renderCanvasPreview();
       renderListaComponentes();
+      
+      // Fecha painel de temas no mobile
+      if (window.closeMobileThemePanel && window.innerWidth <= 900) {
+        window.closeMobileThemePanel();
+      }
     });
 
     btnAplicarComponente?.addEventListener('click', () => {
@@ -427,6 +437,11 @@
       renderCanvasPreview();
       renderListaComponentes();
       updateWrapperSelectionUI();
+      
+      // Fecha painel de temas no mobile
+      if (window.closeMobileThemePanel && window.innerWidth <= 900) {
+        window.closeMobileThemePanel();
+      }
     });
 
     btnResetComponente?.addEventListener('click', () => {
@@ -439,6 +454,11 @@
       renderCanvasPreview();
       renderListaComponentes();
       updateWrapperSelectionUI();
+      
+      // Fecha painel de temas no mobile
+      if (window.closeMobileThemePanel && window.innerWidth <= 900) {
+        window.closeMobileThemePanel();
+      }
     });
   }
 
@@ -994,6 +1014,13 @@
     else selectionState.selectedIds.push(id);
     updateWrapperSelectionUI();
     updatePerComponentCustomizerUI();
+    
+    // Abre painel de temas no mobile quando um componente é selecionado
+    if (window.openMobileThemePanel && window.innerWidth <= 900 && selectionState.selectedIds.includes(id)) {
+      setTimeout(() => {
+        window.openMobileThemePanel();
+      }, 100);
+    }
   }
 
   function clearSelectedComponents() {
@@ -1152,6 +1179,18 @@
       // Não mostrar overlay para painel de baixo
       document.body.style.overflow = 'hidden';
     }
+    
+    function toggleThemePanel() {
+      if (!themePanel) return;
+      const isOpen = themePanel.classList.contains('show');
+      if (isOpen) {
+        themePanel.classList.remove('show');
+        document.body.style.overflow = '';
+      } else {
+        themePanel.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }
+    }
 
     function closeThemePanel() {
       if (themePanel) themePanel.classList.remove('show');
@@ -1161,7 +1200,7 @@
     // Event listeners
     btnCloseComponents?.addEventListener('click', closeComponentsPanel);
     floatingComponentsBtn?.addEventListener('click', toggleComponentsPanel);
-    floatingThemeBtn?.addEventListener('click', openThemePanel);
+    floatingThemeBtn?.addEventListener('click', toggleThemePanel);
     btnCloseThemes?.addEventListener('click', closeThemePanel);
     overlay?.addEventListener('click', () => {
       closeComponentsPanel();
@@ -1178,6 +1217,8 @@
 
     // Exporta função para fechar painel (pode ser chamada após seleção de componente)
     window.closeMobileComponentsPanel = closeComponentsPanel;
+    window.openMobileThemePanel = openThemePanel;
+    window.closeMobileThemePanel = closeThemePanel;
   }
 
   // -------------------
