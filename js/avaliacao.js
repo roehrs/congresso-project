@@ -263,9 +263,12 @@
     const temaIdeal = temaIdealPorPreferencia[persona.preferencia] || 'medio';
     let componentesComTemaIdeal = 0;
     let componentesComTemaOposto = 0;
+    let componentesComTemaPadraoIdeal = 0; // Componentes com tema padrão mas acessibilidade adequada
     
     idsComponentes.forEach((id) => {
       const temaAplicado = temasComponentes[String(id)];
+      const componente = selecionados.find(c => c.id === id);
+      
       if (temaAplicado && temaAplicado !== 'padrao') {
         if (temaAplicado === temaIdeal) {
           componentesComTemaIdeal++;
@@ -276,8 +279,16 @@
         if (temaAplicado === temaOposto) {
           componentesComTemaOposto++;
         }
+      } else if (temaAplicado === 'padrao' || !temaAplicado) {
+        // Se tema padrão, verifica se a acessibilidade do componente é adequada
+        if (componente && componente.acessibilidade === persona.preferencia) {
+          componentesComTemaPadraoIdeal++;
+        }
       }
     });
+    
+    // Ajusta contagem: tema padrão adequado conta como ideal
+    componentesComTemaIdeal += componentesComTemaPadraoIdeal;
     
     const componentesSemTema = idsComponentes.length - componentesComTemaIdeal - componentesComTemaOposto;
     

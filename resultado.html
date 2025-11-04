@@ -211,14 +211,7 @@
                 </ul>
               </div>
             </div>
-            <div>
-              <label for="certificado-email" class="form-label">Receber certificado por e-mail (opcional):</label>
-              <div class="input-group">
-                <input type="email" class="form-control" id="certificado-email" placeholder="seu@email.com">
-                <button class="btn btn-primary" id="btn-enviar-certificado">Enviar</button>
-              </div>
-              <small class="text-muted d-block mt-2">Ou simplesmente feche esta janela para voltar.</small>
-            </div>
+
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -291,24 +284,6 @@
           // Reseta todos os temas ao padrão antes de encerrar
           resetarTodosTemasAoPadrao();
           window.location.href = 'index.html';
-        });
-
-        document.getElementById('btn-enviar-certificado')?.addEventListener('click', () => {
-          const email = document.getElementById('certificado-email')?.value.trim();
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          
-          if (!email) {
-            alert('Por favor, insira um e-mail válido.');
-            return;
-          }
-          
-          if (!emailRegex.test(email)) {
-            alert('Por favor, insira um e-mail válido.');
-            return;
-          }
-          
-          // Enviar certificado por email
-          enviarCertificadoPorEmail(email);
         });
 
         document.addEventListener('DOMContentLoaded', () => {
