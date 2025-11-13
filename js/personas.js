@@ -15,7 +15,8 @@ window.personas = [
     requiredSections: ['Hero', 'Contact'],
     preferredTypes: ['Navbar', 'Section', 'Card'],
     forbiddenTypes: ['Carousel'],
-    weightings: { access: 0.35, required: 0.40, preferred: 0.25 }
+    weightings: { access: 0.35, required: 0.40, preferred: 0.25 },
+    dificuldade: 'dificil'
   },
   {
     id: 2,
@@ -32,7 +33,8 @@ window.personas = [
     requiredSections: ['Gallery'],
     preferredTypes: ['Section', 'Card'],
     forbiddenTypes: [],
-    weightings: { access: 0.30, required: 0.50, preferred: 0.20 }
+    weightings: { access: 0.30, required: 0.50, preferred: 0.20 },
+    dificuldade: 'medio'
   },
   {
     id: 3,
@@ -49,6 +51,7 @@ window.personas = [
     requiredSections: [],
     preferredTypes: ['Navbar', 'Section'],
     forbiddenTypes: [],
-    weightings: { access: 0.70, required: 0.10, preferred: 0.20 }
+    weightings: { access: 0.70, required: 0.10, preferred: 0.20 },
+    dificuldade: 'facil'
   }
 ];

@@ -710,8 +710,17 @@
       localStorage.setItem(STORAGE_KEYS.difficulty, dif);
       localStorage.setItem(STORAGE_KEYS.retries, String(retries));
 
-      const indice = Math.floor(Math.random() * (window.personas?.length || 1));
-      const sorteada = (window.personas && window.personas[indice]) || null;
+      // Filtra personas pela dificuldade escolhida
+      const personasFiltradas = (window.personas || []).filter(p => p.dificuldade === dif);
+      
+      if (personasFiltradas.length === 0) {
+        alert(`Nenhuma persona disponível para a dificuldade "${dif}".`);
+        return;
+      }
+
+      const indice = Math.floor(Math.random() * personasFiltradas.length);
+      const sorteada = personasFiltradas[indice];
+      
       if (sorteada) {
         salvarPersona(sorteada);
         salvarComponentesEscolhidos([]);
