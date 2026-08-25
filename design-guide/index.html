@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Guide — Senac RS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .topbar { background: var(--senac-branco); padding: 20px 32px; border-bottom: var(--senac-divisor); }
+  .topbar img { height: 44px; }
+  main { max-width: 1040px; margin: 0 auto; padding: 40px 24px 80px; }
+  section { background: var(--senac-branco); border-radius: var(--senac-raio-md); box-shadow: var(--senac-sombra); padding: 28px 32px; margin-bottom: 24px; }
+  section > h2 { margin-top: 0; font-size: 1.5rem; color: var(--senac-azul); }
+  .lead { font-size: var(--senac-fs-lg); line-height: var(--senac-lh-md); color: var(--senac-texto); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+  .sw { border-radius: var(--senac-raio-sm); overflow: hidden; border: 1px solid var(--senac-cinza-claro); }
+  .sw .chip { height: 72px; }
+  .sw .meta { padding: 8px 10px; font-size: var(--senac-fs-sm); background: var(--senac-branco); }
+  .sw .meta b { display: block; font-weight: 600; color: var(--senac-texto); }
+  .sw .meta code { font-family: Monaco, "Courier New", monospace; font-size: 12px; color: var(--senac-texto-suave); }
+  .btn { font-family: var(--senac-fonte); font-size: var(--senac-fs-base); font-weight: 600; border: 0; border-radius: var(--senac-raio-sm); padding: 12px 24px; cursor: pointer; margin-right: 10px; }
+  .btn-primary { background: var(--senac-laranja); color: #fff; }
+  .btn-primary:hover { background: var(--senac-laranja-hover); }
+  .btn-primary:focus-visible { outline: 0; box-shadow: var(--senac-foco); }
+  .btn-ghost { background: transparent; color: var(--senac-azul); border: 2px solid var(--senac-azul); }
+  .type-row { display: flex; align-items: baseline; gap: 16px; border-bottom: 1px solid var(--senac-cinza-linha); padding: 10px 0; }
+  .type-row code { min-width: 130px; font-family: Monaco, monospace; font-size: 12px; color: var(--senac-texto-suave); }
+  .shadow-demo { display: flex; gap: 20px; flex-wrap: wrap; }
+  .shadow-demo div { background: #fff; border-radius: var(--senac-raio-md); width: 180px; height: 96px; display: grid; place-items: center; font-size: var(--senac-fs-sm); color: var(--senac-texto-suave); }
+  footer { background: var(--senac-azul-rodape); color: #fff; padding: 32px; text-align: center; }
+  footer img { height: 40px; margin-bottom: 12px; }
+  footer p { margin: 0; font-size: var(--senac-fs-sm); opacity: .85; }
+</style>
+</head>
+<body>
+<div class="topbar"><img src="assets/logo_senac.png" alt="Senac RS"></div>
+<main>
+  <p class="lead">Tokens da marca Senac RS extraídos do site institucional. Esta página é o preview vivo do <code>tokens.css</code> — as amostras abaixo são renderizadas pelas próprias variáveis.</p>
+
+  <section>
+    <h2>Núcleo da marca</h2>
+    <div class="grid" id="core"></div>
+  </section>
+
+  <section>
+    <h2>Neutros</h2>
+    <div class="grid" id="neutros"></div>
+  </section>
+
+  <section>
+    <h2>Paleta secundária</h2>
+    <div class="grid" id="sec"></div>
+  </section>
+
+  <section>
+    <h2>Semânticas</h2>
+    <div class="grid" id="sem"></div>
+  </section>
+
+  <section>
+    <h2>Tipografia</h2>
+    <div class="type-row"><code>h1 · 600 · 2rem</code><h1 style="margin:0;font-size:2rem">Competição Senac</h1></div>
+    <div class="type-row"><code>h3 · 600 · 1.75rem</code><h3 style="margin:0">Escolha sua persona</h3></div>
+    <div class="type-row"><code>body · 300 · 18/28</code><p style="margin:0">Open Sans light é o texto corrido do site. Roboto entra nos componentes de interface.</p></div>
+    <div class="type-row"><code>small · 400 · 14px</code><span style="font-size:14px">Texto de apoio, legenda e metadado.</span></div>
+  </section>
+
+  <section>
+    <h2>Botões</h2>
+    <button class="btn btn-primary">Começar o desafio</button>
+    <button class="btn btn-ghost">Voltar</button>
+    <p style="font-size:14px;color:var(--senac-texto-suave)">Um CTA laranja por tela. O resto em azul ou neutro.</p>
+  </section>
+
+  <section>
+    <h2>Elevação e raio</h2>
+    <div class="shadow-demo">
+      <div style="box-shadow:var(--senac-sombra)">repouso · 16px</div>
+      <div style="box-shadow:var(--senac-sombra-alta)">hover · 16px</div>
+      <div style="box-shadow:var(--senac-sombra-modal)">modal · 16px</div>
+      <div style="box-shadow:var(--senac-foco);border-radius:var(--senac-raio-sm)">foco · 8px</div>
+    </div>
+  </section>
+</main>
+<footer>
+  <img src="assets/logo_senac_white.png" alt="Senac RS">
+  <p>Fundo do rodapé: #003A7B · borda superior 4px #004A8D</p>
+</footer>
+<script>
+const sets = {
+  core: [["Azul Senac","--senac-azul"],["Azul rodapé","--senac-azul-rodape"],["Laranja logo","--senac-laranja-logo"],["Laranja ação","--senac-laranja"],["Laranja hover","--senac-laranja-hover"]],
+  neutros: [["Fundo","--senac-fundo"],["Branco","--senac-branco"],["Texto","--senac-texto"],["Texto corrido","--senac-texto-corrido"],["Texto suave","--senac-texto-suave"],["Borda","--senac-borda"],["Cinza claro","--senac-cinza-claro"]],
+  sec: [["Rosa","--senac-rosa"],["Vermelho","--senac-vermelho"],["Amarelo","--senac-amarelo"],["Verde-limão","--senac-verde-limao"],["Limão claro","--senac-limao-claro"],["Turquesa","--senac-turquesa"],["Teal","--senac-teal"],["Teal escuro","--senac-teal-escuro"],["Roxo","--senac-roxo"],["Azul vivo","--senac-azul-vivo"],["Azul claro","--senac-azul-claro"],["Marinho","--senac-marinho"],["Marinho profundo","--senac-marinho-profundo"],["Azul acinzentado","--senac-azul-acinzentado"],["Dourado","--senac-dourado"]],
+  sem: [["Sucesso","--senac-sucesso"],["Erro","--senac-erro"],["Erro claro","--senac-erro-claro"],["WhatsApp","--senac-whatsapp"]]
+};
+const cs = getComputedStyle(document.documentElement);
+for (const [id, items] of Object.entries(sets)) {
+  document.getElementById(id).innerHTML = items.map(([nome, v]) =>
+    `<div class="sw"><div class="chip" style="background:var(${v})"></div>
+     <div class="meta"><b>${nome}</b><code>${cs.getPropertyValue(v).trim().toUpperCase()}</code></div></div>`
+  ).join("");
+}
+</script>
+</body>
+</html>

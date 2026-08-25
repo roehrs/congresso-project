@@ -1,0 +1,95 @@
+/* Design tokens — marca Senac RS
+   Extraídos de https://www.senacrs.com.br/home em 24/08/2026.
+   Ver DESIGN-GUIDE.md para as regras de uso. */
+
+:root {
+  /* Núcleo da marca */
+  --senac-azul: #004A8D;
+  --senac-azul-rodape: #003A7B;
+  --senac-laranja-logo: #F29100;
+  --senac-laranja: #F77D0C;
+  --senac-laranja-hover: #DF7310;
+
+  /* Neutros */
+  --senac-fundo: #FAFAFA;
+  --senac-branco: #FFFFFF;
+  --senac-texto: #242424;
+  --senac-texto-corrido: #585858;
+  --senac-texto-suave: #484848;
+  --senac-borda: #BFC4CC;
+  --senac-cinza-claro: #E5E5E5;
+  --senac-cinza-linha: #ECECEC;
+
+  /* Semânticas */
+  --senac-sucesso: #008A00;
+  --senac-erro: #BF0119;
+  --senac-erro-claro: #E60000;
+  --senac-whatsapp: #25D366;
+
+  /* Paleta secundária institucional (categorias, tags, ilustração) */
+  --senac-rosa: #F91567;
+  --senac-vermelho: #FC4629;
+  --senac-amarelo: #F6BE00;
+  --senac-verde-limao: #A3CB00;
+  --senac-limao-claro: #D8F912;
+  --senac-turquesa: #34EFDB;
+  --senac-teal: #009BA9;
+  --senac-teal-escuro: #06777F;
+  --senac-roxo: #4839B3;
+  --senac-azul-vivo: #4F7AFB;
+  --senac-azul-claro: #4EB0FA;
+  --senac-marinho: #0130A4;
+  --senac-marinho-profundo: #181C49;
+  --senac-azul-acinzentado: #7784AC;
+  --senac-dourado: #C89633;
+
+  /* Tipografia */
+  --senac-fonte: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --senac-fonte-ui: Roboto, "Open Sans", sans-serif;
+  --senac-peso-corpo: 300;
+  --senac-peso-normal: 400;
+  --senac-peso-titulo: 600;
+  --senac-peso-bold: 700;
+
+  --senac-fs-sm: 14px;
+  --senac-fs-base: 16px;
+  --senac-fs-md: 18px;
+  --senac-fs-lg: 23px;
+  --senac-fs-display: 47px;
+
+  --senac-lh-sm: 24px;
+  --senac-lh-md: 32px;
+  --senac-lh-lg: 48px;
+
+  /* Forma */
+  --senac-raio-sm: 8px;
+  --senac-raio-md: 16px;
+  --senac-raio-full: 50%;
+
+  --senac-sombra: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
+  --senac-sombra-alta: 0 4px 10px #00000008, 0 0 2px #0000000f, 0 2px 6px #0000001f;
+  --senac-sombra-modal: 0 9px 46px 8px #0000001f, 0 24px 38px 3px #00000024, 0 11px 15px #0003;
+  --senac-foco: 0 0 0 .2rem #48484850;
+  --senac-divisor: 4px solid var(--senac-azul);
+}
+
+/* Base sugerida */
+body {
+  background: var(--senac-fundo);
+  font: var(--senac-peso-corpo) var(--senac-fs-md) / 28px var(--senac-fonte);
+  color: var(--senac-texto-corrido);
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--senac-peso-titulo);
+  color: var(--senac-texto);
+  margin: 1.5rem 0 1rem;
+}
+h1 { font-size: 2rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.75rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; }
+h6 { font-size: 1rem; }
