@@ -179,13 +179,13 @@ a:hover {
 }
 
 /* Pequenas adaptações responsivas */
-@media (max-width: 991.98px) {
+@media (max-width: 1199.98px) {
   .prototype-page { max-width: 100%; padding: 8px; }
   .componente-preview { height: 100px; max-height: 100px; }
 }
 
 /* Menu retrátil para tablets e mobile */
-@media (max-width: 991.98px) {
+@media (max-width: 1199.98px) {
   .mobile-components-panel {
     display: none;
     position: fixed;
@@ -194,7 +194,7 @@ a:hover {
     right: 0;
     width: 100%;
     height: auto;
-    max-height: 45vh;
+    max-height: 65vh;
     z-index: 1050;
     transform: translateY(-100%);
     transition: transform 0.3s ease-in-out;
@@ -213,19 +213,24 @@ a:hover {
     padding: 1rem;
   }
   
-  /* Esconde apenas o título duplicado no mobile */
-  .mobile-components-panel h2.h5.d-none.d-lg-block {
+  /* Esconde apenas o título duplicado no mobile/tablet */
+  .mobile-components-panel h2.h5.d-none.d-xl-block {
     display: none;
   }
-  
-  /* Ajusta resumo para mobile */
+
+  /* Ajusta resumo para mobile/tablet: texto compacto pra sobrar espaço pros cards */
   .mobile-components-panel #resumo-componentes {
     padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
-    line-height: 1.4;
+    font-size: 0.8rem;
+    line-height: 1.3;
     flex-shrink: 1;
     min-width: 0;
     max-width: 100%;
+    max-height: 2.6em;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
   
   /* Mantém altura fixa dos botões dos filtros */
@@ -325,11 +330,6 @@ a:hover {
   }
 }
 
-/* Melhorias para tablets */
-@media (max-width: 991.98px) and (min-width: 768px) {
-  /* Mantém largura total do painel de componentes */
-}
-
 /* Ajustes de layout mobile */
 @media (max-width: 767.98px) {
   .hero-section {
@@ -378,26 +378,26 @@ a:hover {
 }
 
 /* Melhorias gerais de responsividade */
-@media (max-width: 991.98px) {
-  .col-lg-5 {
+@media (max-width: 1199.98px) {
+  .col-xl-5 {
     margin-bottom: 1rem;
   }
-  
+
   .card-body h2,
   .card-body h5 {
     font-size: 1.1rem;
   }
-  
+
   #canvas {
     min-height: 200px;
   }
-  
+
   .prototype-block {
     margin-bottom: 8px;
   }
-  
-  /* Canvas ocupa tela cheia no mobile */
-  main .row .col-lg-5 {
+
+  /* Canvas ocupa tela cheia no mobile/tablet */
+  main .row .col-xl-5 {
     flex: 0 0 100%;
     max-width: 100%;
   }
@@ -417,7 +417,7 @@ a:hover {
 }
 
 /* Ajustes específicos para resultado.html */
-@media (max-width: 991.98px) {
+@media (max-width: 1199.98px) {
   .row-eq > [class*='col-'] {
     display: flex !important;
   }

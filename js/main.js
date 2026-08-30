@@ -254,7 +254,7 @@
       updateWrapperSelectionUI();
       
       // Fecha painel de temas no mobile
-      if (window.closeMobileThemePanel && window.innerWidth <= 900) {
+      if (window.closeMobileThemePanel && window.innerWidth <= 1199) {
         window.closeMobileThemePanel();
       }
     });
@@ -270,7 +270,7 @@
       renderListaComponentes();
       
       // Fecha painel de temas no mobile
-      if (window.closeMobileThemePanel && window.innerWidth <= 900) {
+      if (window.closeMobileThemePanel && window.innerWidth <= 1199) {
         window.closeMobileThemePanel();
       }
     });
@@ -288,7 +288,7 @@
       updateWrapperSelectionUI();
       
       // Fecha painel de temas no mobile
-      if (window.closeMobileThemePanel && window.innerWidth <= 900) {
+      if (window.closeMobileThemePanel && window.innerWidth <= 1199) {
         window.closeMobileThemePanel();
       }
     });
@@ -305,7 +305,7 @@
       updateWrapperSelectionUI();
       
       // Fecha painel de temas no mobile
-      if (window.closeMobileThemePanel && window.innerWidth <= 900) {
+      if (window.closeMobileThemePanel && window.innerWidth <= 1199) {
         window.closeMobileThemePanel();
       }
     });
@@ -894,7 +894,7 @@
     updatePerComponentCustomizerUI();
     
     // Abre painel de temas no mobile quando um componente é selecionado
-    if (window.openMobileThemePanel && window.innerWidth <= 900 && selectionState.selectedIds.includes(id)) {
+    if (window.openMobileThemePanel && window.innerWidth <= 1199 && selectionState.selectedIds.includes(id)) {
       setTimeout(() => {
         window.openMobileThemePanel();
       }, 100);
