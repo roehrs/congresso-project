@@ -14,7 +14,6 @@ window.personas = [
     contact: 'mariana@example.com',
     requiredSections: ['Hero', 'Contact'],
     preferredTypes: ['Navbar', 'Section', 'Card'],
-    forbiddenTypes: ['Carousel'],
     weightings: { access: 0.35, required: 0.40, preferred: 0.25 },
     dificuldade: 'dificil'
   },
@@ -32,7 +31,6 @@ window.personas = [
     contact: 'lucas@example.com',
     requiredSections: ['Gallery'],
     preferredTypes: ['Section', 'Card'],
-    forbiddenTypes: [],
     weightings: { access: 0.30, required: 0.50, preferred: 0.20 },
     dificuldade: 'medio'
   },
@@ -50,7 +48,6 @@ window.personas = [
     contact: 'ana@example.com',
     requiredSections: [],
     preferredTypes: ['Navbar', 'Section'],
-    forbiddenTypes: [],
     weightings: { access: 0.70, required: 0.10, preferred: 0.20 },
     dificuldade: 'facil'
   }

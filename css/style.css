@@ -2,12 +2,48 @@
 :root {
   --canvas-padding: 1rem;
   --preview-height: 120px;
-  --selection-outline-color: #0d6efd;
+  --selection-outline-color: #F77D0C;
+
+  /* Identidade visual Senac RS */
+  --senac-blue: #004A8D;
+  --senac-blue-dark: #003A7B;
+  --senac-orange: #F77D0C;
+  --senac-orange-dark: #DF7310;
 }
 
 body {
   background-color: #f8f9fa;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* Navbar e footer do app usam o azul institucional do Senac RS */
+.navbar.bg-dark,
+footer.bg-dark {
+  background-color: var(--senac-blue) !important;
+}
+
+/* Botões de ação principal usam o laranja do Senac RS */
+.btn-primary {
+  background-color: var(--senac-orange);
+  border-color: var(--senac-orange);
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--senac-orange-dark) !important;
+  border-color: var(--senac-orange-dark) !important;
+}
+
+a {
+  color: var(--senac-blue);
+}
+a:hover {
+  color: var(--senac-blue-dark);
+}
+
+.navbar-brand img {
+  height: 32px;
+  width: auto;
 }
 
 /* Canvas container variables (default) */

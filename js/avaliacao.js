@@ -198,6 +198,11 @@
       }
     });
 
+    // Teto: a penalidade de acessibilidade não pode superar o peso total
+    // reservado a essa categoria (mesmo critério usado nas seções requeridas),
+    // mesmo que vários componentes individualmente estejam desalinhados.
+    accessPenalty = Math.min(accessPenalty, w.access * 100);
+
     // === 2. DESCONTO POR SEÇÕES REQUERIDAS AUSENTES ===
     const requiredSections = persona.requiredSections || [];
     let requiredPenalty = 0;
@@ -230,22 +235,27 @@
       }
     }
 
-    // === 3. DESCONTO POR COMPONENTES PROIBIDOS ===
-    let forbiddenPenalty = 0;
-    const forbiddenTypes = persona.forbiddenTypes || [];
-    
-    if (forbiddenTypes.length > 0) {
-      const tiposSelecionados = selecionados.map((c) => c.tipo);
-      // Normaliza tipos para comparação
-      const tiposSelecionadosNorm = tiposSelecionados.map(t => normalizarTipo(t));
-      const forbiddenTypesNorm = forbiddenTypes.map(t => normalizarTipo(t));
-      const forbiddenFound = tiposSelecionadosNorm.filter((t, idx) => forbiddenTypesNorm.includes(t));
-      
-      if (forbiddenFound.length > 0) {
-        forbiddenPenalty = Math.min(40, forbiddenFound.length * 15);
-        const forbiddenNames = tiposSelecionados.filter((t, idx) => forbiddenTypesNorm.includes(tiposSelecionadosNorm[idx]));
-        feedback.push(`✖ Componente(s) não permitido(s): ${forbiddenNames.join(', ')}.`);
-        feedback.push(`⚠ Penalidade aplicada: ${forbiddenPenalty} pontos.`);
+    // === 3. DESCONTO POR TIPOS DE COMPONENTES PREFERIDOS AUSENTES ===
+    const preferredTypes = persona.preferredTypes || [];
+    let preferredPenalty = 0;
+
+    if (preferredTypes.length > 0) {
+      const tiposSelecionadosNorm = selecionados.map((c) => normalizarTipo(c.tipo));
+      let foundPreferredCount = 0;
+
+      preferredTypes.forEach((pref) => {
+        const prefNorm = normalizarTipo(pref);
+        if (tiposSelecionadosNorm.includes(prefNorm)) {
+          foundPreferredCount++;
+          feedback.push(`✔ Tipo de componente preferido presente: ${pref}.`);
+        } else {
+          feedback.push(`○ Tipo de componente preferido ausente: ${pref}.`);
+        }
+      });
+
+      const missingPreferred = preferredTypes.length - foundPreferredCount;
+      if (missingPreferred > 0) {
+        preferredPenalty = (missingPreferred / preferredTypes.length) * (w.preferred * 100);
       }
     }
 
@@ -332,7 +342,7 @@
     score -= Math.round(requiredPenalty);
     score -= Math.round(temaPenalty);
     score -= Math.round(ordemPenalty);
-    score -= Math.round(forbiddenPenalty);
+    score -= Math.round(preferredPenalty);
     
     // Ajusta se necessário
     score = Math.max(0, Math.min(100, score));
@@ -441,39 +451,8 @@
 
   // Função auxiliar para aplicar tema ao HTML sem modificar o componente original
   function aplicarTemaParaRenderizacao(htmlOriginal, temaNome, tipoComponente) {
-    // Define os temas (mesma estrutura do main.js)
-    const TEMAS = {
-      alto: {
-        porTipo: {
-          Navbar: { 'background-color': '#000000', 'background': '#000000', 'color': '#ffffff', 'border-color': '#ffffff' },
-          Footer: { 'background-color': '#000000', 'background': '#000000', 'color': '#ffffff', 'border-color': '#ffffff', 'border-top-color': '#ffffff' },
-          Section: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#000000', 'border-color': '#000000' },
-          Hero: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#000000', 'border-color': '#000000' },
-          Card: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#000000', 'border-color': '#000000' },
-          default: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#000000', 'border-color': '#000000' }
-        }
-      },
-      medio: {
-        porTipo: {
-          Navbar: { 'background-color': '#212529', 'background': '#212529', 'color': '#ffffff', 'border-color': '#495057' },
-          Footer: { 'background-color': '#212529', 'background': '#212529', 'color': '#ffffff', 'border-color': '#495057', 'border-top-color': '#495057' },
-          Section: { 'background-color': '#f8f9fa', 'background': '#f8f9fa', 'color': '#212529', 'border-color': '#dee2e6' },
-          Hero: { 'background-color': '#f8f9fa', 'background': '#f8f9fa', 'color': '#212529', 'border-color': '#dee2e6' },
-          Card: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#212529', 'border-color': '#dee2e6' },
-          default: { 'background-color': '#f8f9fa', 'background': '#f8f9fa', 'color': '#212529', 'border-color': '#dee2e6' }
-        }
-      },
-      baixo: {
-        porTipo: {
-          Navbar: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#6c757d', 'border-color': '#e9ecef' },
-          Footer: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#6c757d', 'border-color': '#e9ecef', 'border-top-color': '#e9ecef' },
-          Section: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#6c757d', 'border-color': '#f1f3f5' },
-          Hero: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#6c757d', 'border-color': '#f1f3f5' },
-          Card: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#6c757d', 'border-color': '#e9ecef' },
-          default: { 'background-color': '#ffffff', 'background': '#ffffff', 'color': '#6c757d', 'border-color': '#e9ecef' }
-        }
-      }
-    };
+    // Temas definidos em js/temas.js (window.TEMAS), compartilhado com main.js
+    const TEMAS = window.TEMAS || {};
 
     if (!temaNome || !TEMAS[temaNome]) return htmlOriginal;
 
