@@ -147,16 +147,29 @@
   // -----------------------------------------
   // Avaliação principal (persona x componentes)
   // -----------------------------------------
+  function categoriasZeradas() {
+    return {
+      acessibilidade: { label: 'Acessibilidade', score: 0 },
+      preferencias: { label: 'Preferências da persona', score: 0 },
+      hierarquia: { label: 'Hierarquia', score: 0 }
+    };
+  }
+
   function avaliar(persona, idsComponentes) {
     const feedback = [];
-    if (!persona) return { score: 0, feedback: ['Nenhuma persona para avaliar.'] };
+    if (!persona) return { score: 0, feedback: ['Nenhuma persona para avaliar.'], categorias: categoriasZeradas() };
 
     const selecionados = (Array.isArray(idsComponentes) ? idsComponentes : [])
       .map((id) => window.componentes.find((c) => c.id === id))
       .filter(Boolean);
 
     if (selecionados.length === 0) {
-      return { score: 0, feedback: ['Nenhum componente selecionado. Tente montar um layout.'], ordemEvaluation: avaliarOrdem(idsComponentes) };
+      return {
+        score: 0,
+        feedback: ['Nenhum componente selecionado. Tente montar um layout.'],
+        ordemEvaluation: avaliarOrdem(idsComponentes),
+        categorias: categoriasZeradas()
+      };
     }
 
     // === INÍCIO COM 100 PONTOS ===
@@ -347,6 +360,28 @@
     // Ajusta se necessário
     score = Math.max(0, Math.min(100, score));
 
+    // === CATEGORIAS: detalhamento da nota por critério (0-100 cada, independentes entre si) ===
+    const TEMA_PENALTY_MAX = 50; // pior caso possível da penalidade de tema (ver tiers acima)
+    const clamp100 = (v) => Math.max(0, Math.min(100, Math.round(v)));
+
+    const acessibilidadeMax = (w.access * 100) + TEMA_PENALTY_MAX;
+    const acessibilidadeScore = clamp100(
+      100 * (1 - (accessPenalty + temaPenalty) / (acessibilidadeMax || 1))
+    );
+
+    const preferenciasMax = (w.required + w.preferred) * 100;
+    const preferenciasScore = clamp100(
+      100 * (1 - (requiredPenalty + preferredPenalty) / (preferenciasMax || 1))
+    );
+
+    const hierarquiaScore = clamp100(ordemResult.score);
+
+    const categorias = {
+      acessibilidade: { label: 'Acessibilidade', score: acessibilidadeScore },
+      preferencias: { label: 'Preferências da persona', score: preferenciasScore },
+      hierarquia: { label: 'Hierarquia', score: hierarquiaScore }
+    };
+
     // === 7. MENSAGEM FINAL ===
     let mensagemFinal = '';
     if (score >= 90) {
@@ -364,7 +399,7 @@
     feedback.unshift(mensagemFinal);
     feedback.unshift(`Pontuação: ${score}/100`);
 
-    return { score, feedback, ordemEvaluation: ordemResult };
+    return { score, feedback, ordemEvaluation: ordemResult, categorias };
   }
 
   // ----------------------------
@@ -540,6 +575,33 @@
   // -------------------------
   // Render UI de resultado (pontuação + canvas)
   // -------------------------
+  function corPorScore(score) {
+    if (score >= 70) return 'bg-success';
+    if (score >= 40) return 'bg-warning';
+    return 'bg-danger';
+  }
+
+  function renderCategorias(categorias) {
+    const container = document.getElementById('categorias-avaliacao');
+    if (!container || !categorias) return;
+
+    container.innerHTML = '';
+    Object.values(categorias).forEach((cat) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'mb-2';
+      wrapper.innerHTML = `
+        <div class="d-flex justify-content-between small mb-1">
+          <span>${cat.label}</span>
+          <span class="fw-semibold">${cat.score}/100</span>
+        </div>
+        <div class="progress" role="progressbar" aria-label="${cat.label}" aria-valuenow="${cat.score}" aria-valuemin="0" aria-valuemax="100" style="height: 10px;">
+          <div class="progress-bar ${corPorScore(cat.score)}" style="width: ${cat.score}%;"></div>
+        </div>
+      `;
+      container.appendChild(wrapper);
+    });
+  }
+
   function renderResultado() {
     const spanPersona = document.getElementById('resultado-persona');
     const spanPrefer = document.getElementById('resultado-prefer');
@@ -562,8 +624,9 @@
     spanPersona.textContent = persona.nome;
     spanPrefer.textContent = persona.preferencia;
 
-    const { score, feedback, ordemEvaluation } = avaliar(persona, ids);
+    const { score, feedback, ordemEvaluation, categorias } = avaliar(persona, ids);
     spanPont.textContent = String(score);
+    renderCategorias(categorias);
     listaFb.innerHTML = '';
     feedback.forEach((f) => {
       const li = document.createElement('li');

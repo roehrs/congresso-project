@@ -418,10 +418,6 @@ a:hover {
 
 /* Ajustes específicos para resultado.html */
 @media (max-width: 1199.98px) {
-  .row-eq > [class*='col-'] {
-    display: flex !important;
-  }
-  
   .card.h-100 {
     display: flex !important;
     flex-direction: column;
