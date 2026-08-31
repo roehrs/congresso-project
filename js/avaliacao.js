@@ -48,6 +48,19 @@
     return tipo;
   }
 
+  function normalizarCategoria(categoria) {
+    if (!categoria) return categoria;
+    const t = categoria.toLowerCase().trim();
+    if (t.includes('card')) return 'Card';
+    if (t.includes('section')) return 'Section';
+    if (t.includes('navbar')) return 'Navbar';
+    if (t.includes('footer')) return 'Footer';
+    if (t.includes('hero')) return 'Hero';
+    if (t.includes('gallery')) return 'Gallery';
+    if (t.includes('contact')) return 'Contact';
+    return categoria;
+  }
+
   const PENALTY_NAVBAR_NOT_FIRST = 20;
   const PENALTY_FOOTER_NOT_LAST = 20;
   const PENALTY_SECTION_BEFORE_NAVBAR = 10;
@@ -228,7 +241,8 @@
       
       requiredSections.forEach((req) => {
         const reqNorm = normalizarTipo(req);
-        if (tiposSelecionadosNorm.includes(reqNorm)) {
+        const reqCategoriaNorm = normalizarCategoria(req);
+        if (tiposSelecionadosNorm.includes(reqNorm) || tiposSelecionadosNorm.includes(reqCategoriaNorm)) {
           foundCount++;
           feedback.push(`✔ Seção requerida presente: ${req}.`);
         } else {
