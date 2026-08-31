@@ -216,6 +216,7 @@ const componentes = [
   {
     id: 12,
     tipo: "Section",
+    categoria: "Section",
     acessibilidade: "baixa",
     descricao: "Seção com fundo colorido e tipografia pequena (impacto visual)",
     html: `
@@ -230,6 +231,7 @@ const componentes = [
   {
     id: 5,
     tipo: "Card",
+    categoria: "Section",
     acessibilidade: "baixa",
     descricao: "Card pequeno e com texto pequeno",
     html: `
@@ -270,6 +272,7 @@ const componentes = [
   {
     id: 13,
     tipo: "Card",
+    categoria: "Section",
     acessibilidade: "alta",
     descricao: "Cards grandes com contraste e CTA evidente",
     html: `
@@ -368,6 +371,7 @@ const componentes = [
   {
     id: 15,
     tipo: "Card",
+    categoria: "Section",
     acessibilidade: "baixa",
     descricao: "Mosaico denso de cards (mais visual, menos legível)",
     html: `
@@ -390,6 +394,7 @@ const componentes = [
   {
     id: 20,
     tipo: "Card",
+    categoria: "Section",
     acessibilidade: "media",
     descricao: "Lista de cards horizontais com ícone e texto",
     html: `
