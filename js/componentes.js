@@ -276,7 +276,7 @@ const componentes = [
 <section style="padding: 3rem 0;">
   <div style="width: 100%; padding-right: 15px; padding-left: 15px; margin-left: auto; margin-right: auto; max-width: 1320px;">
     <div style="display: flex; flex-wrap: wrap; margin-right: -15px; margin-left: -15px;">
-      <div style="flex: 0 0 auto; width: 33.33333333%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
+      <div style="flex: 0 0 auto; width: 50%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
         <div style="position: relative; display: flex; flex-direction: column; min-width: 0; word-wrap: break-word; background-color: #fff; background-clip: border-box; border: 2px solid rgba(0,0,0,0.125); border-radius: 0.375rem; height: 100%;">
           <div style="flex: 1 1 auto; padding: 1rem;">
             <h4 style="font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 500; line-height: 1.2;">Plano Básico</h4>
@@ -285,7 +285,7 @@ const componentes = [
           </div>
         </div>
       </div>
-      <div style="flex: 0 0 auto; width: 33.33333333%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
+      <div style="flex: 0 0 auto; width: 50%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
         <div style="position: relative; display: flex; flex-direction: column; min-width: 0; word-wrap: break-word; background-color: #fff; background-clip: border-box; border: 2px solid rgba(0,0,0,0.125); border-radius: 0.375rem; height: 100%;">
           <div style="flex: 1 1 auto; padding: 1rem;">
             <h4 style="font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 500; line-height: 1.2;">Plano Pro</h4>
@@ -294,7 +294,7 @@ const componentes = [
           </div>
         </div>
       </div>
-      <div style="flex: 0 0 auto; width: 33.33333333%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
+      <div style="flex: 0 0 auto; width: 50%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
         <div style="position: relative; display: flex; flex-direction: column; min-width: 0; word-wrap: break-word; background-color: #fff; background-clip: border-box; border: 2px solid rgba(0,0,0,0.125); border-radius: 0.375rem; height: 100%;">
           <div style="flex: 1 1 auto; padding: 1rem;">
             <h4 style="font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 500; line-height: 1.2;">Plano Premium</h4>
@@ -316,7 +316,7 @@ const componentes = [
 <section style="padding: 3rem 0; background-color: #f8f9fa;">
   <div style="width: 100%; padding-right: 15px; padding-left: 15px; margin-left: auto; margin-right: auto; max-width: 1320px;">
     <div style="display: flex; flex-wrap: wrap; margin-right: -15px; margin-left: -15px;">
-      <div style="flex: 0 0 auto; width: 33.33333333%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
+      <div style="flex: 0 0 auto; width: 50%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
         <div style="position: relative; display: flex; flex-direction: column; min-width: 0; word-wrap: break-word; background-color: #fff; background-clip: border-box; border: 1px solid rgba(0,0,0,0.125); border-radius: 0.375rem; height: 100%;">
           <img src="https://picsum.photos/seed/a/600/300" alt="Imagem" style="width: 100%; border-top-left-radius: calc(0.375rem - 1px); border-top-right-radius: calc(0.375rem - 1px);">
           <div style="flex: 1 1 auto; padding: 1rem;">
@@ -325,7 +325,7 @@ const componentes = [
           </div>
         </div>
       </div>
-      <div style="flex: 0 0 auto; width: 33.33333333%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
+      <div style="flex: 0 0 auto; width: 50%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
         <div style="position: relative; display: flex; flex-direction: column; min-width: 0; word-wrap: break-word; background-color: #fff; background-clip: border-box; border: 1px solid rgba(0,0,0,0.125); border-radius: 0.375rem; height: 100%;">
           <img src="https://picsum.photos/seed/b/600/300" alt="Imagem" style="width: 100%; border-top-left-radius: calc(0.375rem - 1px); border-top-right-radius: calc(0.375rem - 1px);">
           <div style="flex: 1 1 auto; padding: 1rem;">
@@ -334,7 +334,7 @@ const componentes = [
           </div>
         </div>
       </div>
-      <div style="flex: 0 0 auto; width: 33.33333333%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
+      <div style="flex: 0 0 auto; width: 50%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
         <div style="position: relative; display: flex; flex-direction: column; min-width: 0; word-wrap: break-word; background-color: #fff; background-clip: border-box; border: 1px solid rgba(0,0,0,0.125); border-radius: 0.375rem; height: 100%;">
           <img src="https://picsum.photos/seed/c/600/300" alt="Imagem" style="width: 100%; border-top-left-radius: calc(0.375rem - 1px); border-top-right-radius: calc(0.375rem - 1px);">
           <div style="flex: 1 1 auto; padding: 1rem;">
