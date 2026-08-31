@@ -5,7 +5,7 @@ window.componentes = window.componentes || [];
 ;(function () {
   const extras = [
     {
-      id: 101,
+      id: 19,
       tipo: 'Hero',
       categoria: 'Section',
       descricao: 'Seção inicial com título, subtítulo e CTA — foco em destaque visual.',
@@ -21,7 +21,7 @@ window.componentes = window.componentes || [];
       `
     },
     {
-      id: 102,
+      id: 20,
       tipo: 'Contact',
       categoria: 'Section',
       descricao: 'Seção de contato com formulário simples e informações de contato.',
@@ -47,7 +47,7 @@ window.componentes = window.componentes || [];
       `
     },
     {
-      id: 103,
+      id: 21,
       tipo: 'Gallery',
       categoria: 'Section',
       descricao: 'Galeria de imagens em grid — ideal para portfólios e exibição visual.',
