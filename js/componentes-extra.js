@@ -58,54 +58,42 @@ window.componentes = window.componentes || [];
             <figure style="margin: 0;">
               <img
                 alt="Imagem 1"
-                src="https://picsum.photos/seed/gallery1/600/360"
-                srcset="https://picsum.photos/seed/gallery1/300/180 300w, https://picsum.photos/seed/gallery1/600/360 600w"
-                sizes="(max-width:600px) 100vw, 33vw"
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='360'%3E%3Crect width='600' height='360' fill='rgb(207,226,255)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial, sans-serif' font-size='28' fill='rgb(13,110,253)' text-anchor='middle' dominant-baseline='middle'%3EImagem 1%3C/text%3E%3C/svg%3E"
                 style="width: 100%; height: auto; border-radius: 6px; display: block;"
                 loading="lazy">
             </figure>
             <figure style="margin: 0;">
               <img
                 alt="Imagem 2"
-                src="https://picsum.photos/seed/gallery2/600/360"
-                srcset="https://picsum.photos/seed/gallery2/300/180 300w, https://picsum.photos/seed/gallery2/600/360 600w"
-                sizes="(max-width:600px) 100vw, 33vw"
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='360'%3E%3Crect width='600' height='360' fill='rgb(255,224,178)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial, sans-serif' font-size='28' fill='rgb(214,102,0)' text-anchor='middle' dominant-baseline='middle'%3EImagem 2%3C/text%3E%3C/svg%3E"
                 style="width: 100%; height: auto; border-radius: 6px; display: block;"
                 loading="lazy">
             </figure>
             <figure style="margin: 0;">
               <img
                 alt="Imagem 3"
-                src="https://picsum.photos/seed/gallery3/600/360"
-                srcset="https://picsum.photos/seed/gallery3/300/180 300w, https://picsum.photos/seed/gallery3/600/360 600w"
-                sizes="(max-width:600px) 100vw, 33vw"
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='360'%3E%3Crect width='600' height='360' fill='rgb(198,240,220)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial, sans-serif' font-size='28' fill='rgb(15,123,79)' text-anchor='middle' dominant-baseline='middle'%3EImagem 3%3C/text%3E%3C/svg%3E"
                 style="width: 100%; height: auto; border-radius: 6px; display: block;"
                 loading="lazy">
             </figure>
             <figure style="margin: 0;">
               <img
                 alt="Imagem 4"
-                src="https://picsum.photos/seed/gallery4/600/360"
-                srcset="https://picsum.photos/seed/gallery4/300/180 300w, https://picsum.photos/seed/gallery4/600/360 600w"
-                sizes="(max-width:600px) 100vw, 33vw"
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='360'%3E%3Crect width='600' height='360' fill='rgb(230,215,250)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial, sans-serif' font-size='28' fill='rgb(111,66,193)' text-anchor='middle' dominant-baseline='middle'%3EImagem 4%3C/text%3E%3C/svg%3E"
                 style="width: 100%; height: auto; border-radius: 6px; display: block;"
                 loading="lazy">
             </figure>
             <figure style="margin: 0;">
               <img
                 alt="Imagem 5"
-                src="https://picsum.photos/seed/gallery5/600/360"
-                srcset="https://picsum.photos/seed/gallery5/300/180 300w, https://picsum.photos/seed/gallery5/600/360 600w"
-                sizes="(max-width:600px) 100vw, 33vw"
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='360'%3E%3Crect width='600' height='360' fill='rgb(255,205,210)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial, sans-serif' font-size='28' fill='rgb(198,40,40)' text-anchor='middle' dominant-baseline='middle'%3EImagem 5%3C/text%3E%3C/svg%3E"
                 style="width: 100%; height: auto; border-radius: 6px; display: block;"
                 loading="lazy">
             </figure>
             <figure style="margin: 0;">
               <img
                 alt="Imagem 6"
-                src="https://picsum.photos/seed/gallery6/600/360"
-                srcset="https://picsum.photos/seed/gallery6/300/180 300w, https://picsum.photos/seed/gallery6/600/360 600w"
-                sizes="(max-width:600px) 100vw, 33vw"
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='360'%3E%3Crect width='600' height='360' fill='rgb(178,235,242)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial, sans-serif' font-size='28' fill='rgb(0,131,143)' text-anchor='middle' dominant-baseline='middle'%3EImagem 6%3C/text%3E%3C/svg%3E"
                 style="width: 100%; height: auto; border-radius: 6px; display: block;"
                 loading="lazy">
             </figure>

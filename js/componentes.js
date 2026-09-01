@@ -330,7 +330,7 @@ const componentes = [
     <div style="display: flex; flex-wrap: wrap; margin-right: -15px; margin-left: -15px;">
       <div style="flex: 0 0 auto; width: 50%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
         <div style="position: relative; display: flex; flex-direction: column; min-width: 0; word-wrap: break-word; background-color: #fff; background-clip: border-box; border: 1px solid rgba(0,0,0,0.125); border-radius: 0.375rem; height: 100%;">
-          <img src="https://picsum.photos/seed/a/600/300" alt="Imagem" style="width: 100%; border-top-left-radius: calc(0.375rem - 1px); border-top-right-radius: calc(0.375rem - 1px);">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300'%3E%3Crect width='600' height='300' fill='rgb(222,235,255)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial, sans-serif' font-size='28' fill='rgb(13,110,253)' text-anchor='middle' dominant-baseline='middle'%3EImagem%3C/text%3E%3C/svg%3E" alt="Imagem" style="width: 100%; border-top-left-radius: calc(0.375rem - 1px); border-top-right-radius: calc(0.375rem - 1px);">
           <div style="flex: 1 1 auto; padding: 1rem;">
             <h5 style="font-size: 1.25rem; margin-bottom: 0.5rem; font-weight: 500; line-height: 1.2;">Título</h5>
             <p style="margin-bottom: 0; color: #6c757d; line-height: 1.5;">Descrição moderada e legível.</p>
@@ -339,7 +339,7 @@ const componentes = [
       </div>
       <div style="flex: 0 0 auto; width: 50%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
         <div style="position: relative; display: flex; flex-direction: column; min-width: 0; word-wrap: break-word; background-color: #fff; background-clip: border-box; border: 1px solid rgba(0,0,0,0.125); border-radius: 0.375rem; height: 100%;">
-          <img src="https://picsum.photos/seed/b/600/300" alt="Imagem" style="width: 100%; border-top-left-radius: calc(0.375rem - 1px); border-top-right-radius: calc(0.375rem - 1px);">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300'%3E%3Crect width='600' height='300' fill='rgb(255,236,219)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial, sans-serif' font-size='28' fill='rgb(214,102,0)' text-anchor='middle' dominant-baseline='middle'%3EImagem%3C/text%3E%3C/svg%3E" alt="Imagem" style="width: 100%; border-top-left-radius: calc(0.375rem - 1px); border-top-right-radius: calc(0.375rem - 1px);">
           <div style="flex: 1 1 auto; padding: 1rem;">
             <h5 style="font-size: 1.25rem; margin-bottom: 0.5rem; font-weight: 500; line-height: 1.2;">Título</h5>
             <p style="margin-bottom: 0; color: #6c757d; line-height: 1.5;">Equilíbrio visual.</p>
@@ -348,7 +348,7 @@ const componentes = [
       </div>
       <div style="flex: 0 0 auto; width: 50%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
         <div style="position: relative; display: flex; flex-direction: column; min-width: 0; word-wrap: break-word; background-color: #fff; background-clip: border-box; border: 1px solid rgba(0,0,0,0.125); border-radius: 0.375rem; height: 100%;">
-          <img src="https://picsum.photos/seed/c/600/300" alt="Imagem" style="width: 100%; border-top-left-radius: calc(0.375rem - 1px); border-top-right-radius: calc(0.375rem - 1px);">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300'%3E%3Crect width='600' height='300' fill='rgb(222,247,236)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial, sans-serif' font-size='28' fill='rgb(25,135,84)' text-anchor='middle' dominant-baseline='middle'%3EImagem%3C/text%3E%3C/svg%3E" alt="Imagem" style="width: 100%; border-top-left-radius: calc(0.375rem - 1px); border-top-right-radius: calc(0.375rem - 1px);">
           <div style="flex: 1 1 auto; padding: 1rem;">
             <h5 style="font-size: 1.25rem; margin-bottom: 0.5rem; font-weight: 500; line-height: 1.2;">Título</h5>
             <p style="margin-bottom: 0; color: #6c757d; line-height: 1.5;">Boa hierarquia.</p>
@@ -357,7 +357,7 @@ const componentes = [
       </div>
       <div style="flex: 0 0 auto; width: 50%; padding-right: 15px; padding-left: 15px; margin-bottom: 1rem;">
         <div style="position: relative; display: flex; flex-direction: column; min-width: 0; word-wrap: break-word; background-color: #fff; background-clip: border-box; border: 1px solid rgba(0,0,0,0.125); border-radius: 0.375rem; height: 100%;">
-          <img src="https://picsum.photos/seed/c/600/300" alt="Imagem" style="width: 100%; border-top-left-radius: calc(0.375rem - 1px); border-top-right-radius: calc(0.375rem - 1px);">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300'%3E%3Crect width='600' height='300' fill='rgb(222,247,236)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial, sans-serif' font-size='28' fill='rgb(25,135,84)' text-anchor='middle' dominant-baseline='middle'%3EImagem%3C/text%3E%3C/svg%3E" alt="Imagem" style="width: 100%; border-top-left-radius: calc(0.375rem - 1px); border-top-right-radius: calc(0.375rem - 1px);">
           <div style="flex: 1 1 auto; padding: 1rem;">
             <h5 style="font-size: 1.25rem; margin-bottom: 0.5rem; font-weight: 500; line-height: 1.2;">Título</h5>
             <p style="margin-bottom: 0; color: #6c757d; line-height: 1.5;">Boa hierarquia.</p>
