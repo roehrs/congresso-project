@@ -268,11 +268,12 @@
 
     if (preferredTypes.length > 0) {
       const tiposSelecionadosNorm = selecionados.map((c) => normalizarTipo(c.tipo));
+      const categoriasSelecionadasNorm = selecionados.map((c) => normalizarCategoria(c.categoria));
       let foundPreferredCount = 0;
 
       preferredTypes.forEach((pref) => {
         const prefNorm = normalizarTipo(pref);
-        if (tiposSelecionadosNorm.includes(prefNorm)) {
+        if (tiposSelecionadosNorm.includes(prefNorm) || categoriasSelecionadasNorm.includes(prefNorm)) {
           foundPreferredCount++;
           feedback.push(`✔ Tipo de componente preferido presente: ${pref}.`);
         } else {
