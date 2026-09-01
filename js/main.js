@@ -652,18 +652,6 @@
                 ${gostos.map((g) => `<span class="badge bg-light text-dark border">${String(g)}</span>`).join(' ')}
               </div>
           </div>` : ''}
-
-        ${persona.demografia || persona.location ? `
-            <div class="persona-section">
-          <div class="persona-section-title">Demografia</div>
-              <div class="persona-meta">${persona.demografia || persona.location}</div>
-            </div>` : ''}
-
-        ${persona.contact ? `
-            <div class="persona-section">
-              <div class="persona-section-title">Contato</div>
-              <div class="persona-meta">${persona.contact}</div>
-            </div>` : ''}
       </div>
     </div>
   `;
