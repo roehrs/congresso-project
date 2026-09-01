@@ -988,10 +988,22 @@
   // -------------------
   // Seleção pública (adicionar componente ao canvas)
   // -------------------
+  function mostrarAviso(mensagem) {
+    const toastEl = document.getElementById('toast-aviso');
+    const toastBody = document.getElementById('toast-aviso-body');
+    if (!toastEl || !toastBody || !window.bootstrap) {
+      alert(mensagem);
+      return;
+    }
+    toastBody.textContent = mensagem;
+    const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 2500 });
+    toast.show();
+  }
+
   window.selectComponent = function (id) {
     const ids = lerComponentesEscolhidos();
     if (ids.includes(id)) {
-      alert('Componente já selecionado.');
+      mostrarAviso('Componente já selecionado.');
       return;
     }
     ids.push(id);
