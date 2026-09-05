@@ -1,5 +1,9 @@
 # Simulador Monte o Site — Senac RS
 
+Projeto arquivado em setembro de 2026 junto com a frente das Competições Senac.
+Não sugerir tarefas, prazos ou próximos passos. Consultar ou alterar somente
+quando o Diogo pedir explicitamente algo deste histórico.
+
 Jogo de estande das Competições Senac RS. O visitante recebe uma persona sorteada,
 monta a página dela com blocos prontos e recebe nota explicada + certificado.
 
